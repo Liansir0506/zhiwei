@@ -27,7 +27,7 @@ DEV_CASES = ROOT / 'data/candidates/sop-record-revision-r2/existing-development-
 PARENT_VERSION = 'local-content-quality-r1'
 PARENT_DOC, PARENT_FAQ = 'local_content_quality_r1_doc', 'local_content_quality_r1_faq'
 R2 = dict(version='test-sop-records-r2', milvus='http://127.0.0.1:29530',
-          mysql='mysql+pymysql://rag:rag_pass@127.0.0.1:13306/test_sop_records_r2?charset=utf8mb4',
+          mysql=os.environ.get('ZHIWEI_R2_MYSQL_DSN', 'mysql+pymysql://rag@127.0.0.1:13306/test_sop_records_r2?charset=utf8mb4'),
           doc='test_sop_records_r2_doc', faq='test_sop_records_r2_faq')
 TABLES = ['kb_versions', 'kb_version_manifests', 'ingest_records', 'knowledge_assets',
           'knowledge_relations', 'knowledge_source_withdrawals', 'ingest_jobs', 'evidence_locations']

@@ -18,7 +18,7 @@ flowchart LR
 
 原项目`telecom-ops-rag`共8个服务，使用工作树的`.env.runtime`重启。容器间走服务名；代码来自当前工作树，模型/场景/数据/报告来自`F:/heima/myproject`挂载，容器内场景固定为`/app/scenarios`。镜像使用CPU Torch；启动按embedding→rerank→intent顺序预热，`/health`显示组件及intent就绪状态。
 
-test存储使用独立项目、MySQL13306、Redis16379/DB15和Milvus29530。协议开发集合为`test_protocol_r1_doc`/`test_protocol_r1_faq`，管理员预览`v4-protocol-dev-r1`；宿主验证另启空闲回环端口，不复用较早的18010进程。运行证据见[首版总验收](FIRST_RELEASE_ACCEPTANCE_2026-10-07.md)。
+test存储使用独立项目、MySQL13306、Redis16379/DB15和Milvus29530。协议开发集合为`test_protocol_r1_doc`/`test_protocol_r1_faq`，管理员预览`v4-protocol-dev-r1`；宿主验证另启空闲回环端口，不复用较早的18010进程。历史运行证据保留于本机；新克隆的配置与范围见[环境隔离](ENVIRONMENT_ISOLATION.md)。
 
 ## 2. 包结构与职责
 

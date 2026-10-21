@@ -10,7 +10,6 @@ __pycache__
 .test-tmp
 models
 data/raw
-../../RIANJIAN/RAG2/04_代码/xa03_knowforge-rag-platform/scripts/logs
 reports
 site
 .env

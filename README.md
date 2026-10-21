@@ -38,7 +38,6 @@ config/environments 环境配置模板
 scenarios/          场景配置
 tests/              单元、组件、集成与浏览器检查
 docs/               架构、接口、数据治理与验收范围
-design/             界面设计方案
 ```
 
 ## 新环境准备
@@ -48,11 +47,11 @@ design/             界面设计方案
 ```powershell
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
-Copy-Item config/environments/dev.env.example .env.dev
+.venv/Scripts/python.exe scripts/init_local_env.py --environment dev
 $env:APP_ENV_FILE = '.env.dev'
 ```
 
-编辑 `.env.dev`，设置存储地址、模型目录和鉴权配置。初次检查建议设置 `GENERATION_ENABLED=false`、`AGENT_ENABLED=false`，保持 `AUTH_REQUIRED=true`；需要生成时再在本机填写 `LLM_API_KEY`。
+初始化器会生成随机口令，拒绝覆盖已有文件。编辑 `.env.dev`，核对存储地址、模型目录和鉴权配置。初次检查建议设置 `GENERATION_ENABLED=false`、`AGENT_ENABLED=false`，保持 `AUTH_REQUIRED=true`；需要生成时再在本机填写 `LLM_API_KEY`。
 
 ```powershell
 # 仅启动新环境所需的存储；不会运行历史发布控制器或 Worker
@@ -83,6 +82,6 @@ docker compose --env-file .env.dev -p zhiwei-dev up -d mysql redis etcd minio mi
 
 ## 上传范围
 
-包含源码、测试、配置模板、设计方案及文档；排除 `.env*` 私密配置、API Key、`.runtime/`、模型权重、原始语料、冻结候选包、数据库/向量快照、私有评测题集及原始运行报告。文档中的本机路径与运行证据链接属于历史记录，源码仓库不含这些私密产物，不能视为克隆后已经存在。
+包含源码、测试、配置模板及必要文档；排除 `.env*` 私密配置、API Key、`.runtime/`、模型权重、原始语料、冻结候选包、数据库/向量快照、私有评测题集及原始运行报告。文档中的本机路径与运行证据链接属于历史记录，源码仓库不含这些私密产物，不能视为克隆后已经存在。
 
-[架构](docs/ARCHITECTURE.md) · [API](docs/API_CONTRACT.md) · [数据模型](docs/DATA_MODEL.md) · [开发历史](docs/LOCAL_DEVELOPMENT_HISTORY.md)
+[架构](docs/ARCHITECTURE.md) · [API](docs/API_CONTRACT.md) · [数据模型](docs/DATA_MODEL.md) · [仓库审查](docs/REPOSITORY_AUDIT.md)

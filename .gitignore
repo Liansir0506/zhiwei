@@ -31,3 +31,19 @@ __pycache__/
 .vscode/
 volumes/
 test-results/
+# Additional private material and local tooling
+.aws/
+.ssh/
+.codex/
+.agents/
+id_rsa
+id_ed25519
+*.p12
+*.pfx
+*.jks
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+*.har

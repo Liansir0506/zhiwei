@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     adapter_max_retries: int = 2
     adapter_page_size: int = 100
 
-    mysql_dsn: str = "mysql+pymysql://rag:rag_pass@mysql:3306/rag_kb?charset=utf8mb4"
+    mysql_dsn: str = "mysql+pymysql://rag@mysql:3306/rag_kb?charset=utf8mb4"
     redis_url: str = "redis://redis:6379/0"
     milvus_uri: str = "http://milvus:19530"
     doc_collection: str = "doc_collection"
