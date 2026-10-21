@@ -1,0 +1,30 @@
+/* Consistent, brief feedback without moving the application shell. */
+:root { --motion-feedback:180ms; }
+@keyframes uiSpin { to { transform:rotate(360deg); } }
+@keyframes uiReveal { from { opacity:0;transform:translateY(4px); } to { opacity:1;transform:none; } }
+@keyframes uiDrawerIn { from { opacity:0;transform:translateX(24px); } to { opacity:1;transform:none; } }
+@keyframes uiMaskIn { from { opacity:0; } to { opacity:1; } }
+@keyframes uiShimmer { from { background-position:180% 0; } to { background-position:-80% 0; } }
+.ui-btn[aria-busy="true"]::before,button.primary[aria-busy="true"]::before {
+  content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-2px;
+  border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:uiSpin .8s linear infinite;flex-shrink:0;
+}
+.ui-btn[aria-busy="true"] { cursor:progress; }
+.tabview.active { animation:uiPageIn var(--motion-page) var(--ease-ui); }
+.qresult:not([hidden]),#uploadStepResult:not([hidden]),.gk-close-form,.version-plan-confirmation,
+.notice.bad,.context-error,.notice.ok { animation:uiReveal var(--motion-feedback) var(--ease-ui); }
+.sess-drawer:not([hidden]),body.context-open #view-qa aside.right { animation:uiDrawerIn var(--motion-panel) var(--ease-ui); }
+.workspace-mask:not([hidden]),.sess-mask:not([hidden]) { animation:uiMaskIn var(--motion-fast) ease-out; }
+details > summary { transition:color var(--motion-fast) ease; }
+details > summary:hover { color:var(--brand); }
+.nav-item,.subnav-item,.sub-tab,.gk-tab,.top-icon,.qexample,.version-item {
+  transition:background-color var(--motion-fast),border-color var(--motion-fast),color var(--motion-fast),box-shadow var(--motion-fast);
+}
+.ui-btn:not(:disabled):active,.qexample:active,.top-icon:active { transform:translateY(1px); }
+.dash-skeleton,.skeleton { background:linear-gradient(100deg,var(--color-bg-subtle) 20%,var(--color-brand-50) 45%,var(--color-bg-subtle) 70%);background-size:220% 100%;animation:uiShimmer 1.5s linear infinite; }
+.qstat-card[aria-busy="true"] { opacity:.72; }
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation:none!important;transition:none!important;scroll-behavior:auto!important; }
+  .chart-line { stroke-dashoffset:0; }
+  .ui-btn:active,.qexample:active,.top-icon:active { transform:none; }
+}

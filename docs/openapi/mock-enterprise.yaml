@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: SIMULATED Enterprise Systems Contract
+  version: 1.0.0
+  description: 技术验证用模拟接口；不对应任何真实客户、厂商或生产系统。
+servers:
+  - url: http://localhost:8020
+paths:
+  /health:
+    get:
+      summary: 模拟服务健康检查
+      responses:
+        '200': {description: healthy}
+  /mock/v1/{resource}:
+    get:
+      summary: 分页读取模拟企业数据
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [cmdb, alarms, monitoring, work-orders, changes, wiki]
+        - name: cursor
+          in: query
+          schema: {type: string, nullable: true}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 200, default: 100}
+      responses:
+        '200':
+          description: 模拟分页响应
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEnvelope'
+        '400': {description: 无效游标}
+        '404': {description: 未知资源}
+        '503': {description: 模拟上游故障}
+components:
+  schemas:
+    PageEnvelope:
+      type: object
+      additionalProperties: false
+      required: [source, simulation, items, next_cursor]
+      properties:
+        source: {type: string}
+        simulation: {type: boolean, enum: [true]}
+        items: {type: array, items: {type: object}}
+        next_cursor: {type: string, nullable: true}

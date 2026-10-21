@@ -1,0 +1,197 @@
+name: ${COMPOSE_PROJECT_NAME:-telecom-ops-rag}
+
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.14
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    volumes:
+      - etcd_data:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: minio server /minio_data
+    volumes:
+      - minio_data:/minio_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  milvus:
+    image: milvusdb/milvus:v2.5.4
+    ports:
+      - "${MILVUS_HOST_PORT:-19530}:19530"
+      - "${MILVUS_HEALTH_HOST_PORT:-9091}:9091"
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - milvus_data:/var/lib/milvus
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "${MYSQL_HOST_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rag_root
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rag_kb}
+      MYSQL_USER: rag
+      MYSQL_PASSWORD: rag_pass
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prag_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "${API_HOST_PORT:-8010}:8010"
+    env_file:
+      - path: ${APP_ENV_FILE:-.env}
+        required: false
+    environment:
+      # 容器内一律走服务名与容器路径（覆盖 .env 中的本机调试值）
+      APP_ENV: ${APP_ENV:-dev}
+      API_PORT: 8010
+      MYSQL_DSN: mysql+pymysql://rag:rag_pass@mysql:3306/${MYSQL_DATABASE:-rag_kb}?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/${REDIS_DB:-0}
+      MILVUS_URI: http://milvus:19530
+      DOC_COLLECTION: ${DOC_COLLECTION:-doc_collection}
+      FAQ_COLLECTION: ${FAQ_COLLECTION:-faq_collection}
+      DATA_DIR: /app/data
+      REPORTS_DIR: /app/reports
+      APP_SCENARIOS_DIR: /app/scenarios
+      MODELS_DIR: /app/models
+      EMBEDDING_MODEL_PATH: /app/models/bge-m3
+      RERANKER_MODEL_PATH: /app/models/bge-reranker-large
+      INTENT_MODEL_PATH: /app/models/bert_intent_classifier_v1
+      ENTERPRISE_BASE_URL: http://enterprise-mock:8020/mock/v1
+      ADAPTER_TIMEOUT_SECONDS: ${ADAPTER_TIMEOUT_SECONDS:-2}
+      ADAPTER_MAX_RETRIES: ${ADAPTER_MAX_RETRIES:-2}
+    volumes:
+      - ${APP_MODELS_DIR:-./models}:/app/models:ro
+      - ${APP_DATA_DIR:-./data}:/app/data
+      - ${APP_SCENARIOS_DIR:-./scenarios}:/app/scenarios:ro
+      - ${APP_REPORTS_DIR:-./reports}:/app/reports
+      # 开发模式：代码目录挂载，改动后 docker compose restart api 即生效（无需重建镜像）
+      - ./qa_core:/app/qa_core
+      - ./scripts:/app/scripts
+      - ./static:/app/static
+      - ./app.py:/app/app.py
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+
+  ingest-worker:
+    build: .
+    command: ["python", "scripts/ingest_worker.py", "--concurrency", "${INGEST_WORKER_CONCURRENCY:-1}", "--poll-seconds", "2", "--lease-seconds", "900"]
+    env_file:
+      - path: ${APP_ENV_FILE:-.env}
+        required: false
+    environment:
+      PYTHONUNBUFFERED: "1"
+      OMP_NUM_THREADS: ${INGEST_OMP_THREADS:-4}
+      MKL_NUM_THREADS: ${INGEST_OMP_THREADS:-4}
+      OPENBLAS_NUM_THREADS: ${INGEST_OMP_THREADS:-4}
+      TOKENIZERS_PARALLELISM: "false"
+      APP_ENV: ${APP_ENV:-dev}
+      MYSQL_DSN: mysql+pymysql://rag:rag_pass@mysql:3306/${MYSQL_DATABASE:-rag_kb}?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/${REDIS_DB:-0}
+      MILVUS_URI: http://milvus:19530
+      DOC_COLLECTION: ${DOC_COLLECTION:-doc_collection}
+      FAQ_COLLECTION: ${FAQ_COLLECTION:-faq_collection}
+      DATA_DIR: /app/data
+      REPORTS_DIR: /app/reports
+      APP_SCENARIOS_DIR: /app/scenarios
+      MODELS_DIR: /app/models
+      EMBEDDING_MODEL_PATH: /app/models/bge-m3
+      RERANKER_MODEL_PATH: /app/models/bge-reranker-large
+      INTENT_MODEL_PATH: /app/models/bert_intent_classifier_v1
+      EMBEDDING_DEVICE: cpu
+    volumes:
+      - ${APP_MODELS_DIR:-./models}:/app/models:ro
+      - ${APP_DATA_DIR:-./data}:/app/data
+      - ${APP_SCENARIOS_DIR:-./scenarios}:/app/scenarios:ro
+      - ${APP_REPORTS_DIR:-./reports}:/app/reports
+      - ./qa_core:/app/qa_core:ro
+      - ./scripts:/app/scripts:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+    restart: unless-stopped
+    # 镜像默认健康检查面向 FastAPI :8010；Worker 不监听 HTTP，由任务 heartbeat 判活。
+    healthcheck:
+      disable: true
+
+  enterprise-mock:
+    build: .
+    command: ["uvicorn", "qa_core.integrations.mock_service:app", "--host", "0.0.0.0", "--port", "8020"]
+    ports:
+      - "${MOCK_ENTERPRISE_HOST_PORT:-8020}:8020"
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    volumes:
+      - ./qa_core:/app/qa_core:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8020/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  etcd_data:
+  minio_data:
+  milvus_data:
+  mysql_data:
+  redis_data:

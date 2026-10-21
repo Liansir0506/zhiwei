@@ -1,0 +1,23 @@
+{
+  "protocol": "chat-content-acknowledgement-v1",
+  "decision": "content_accepted_only",
+  "scope": "bfd_and_netconf_source_card_wording_at_bound_hashes_only",
+  "reviewer": "user_in_current_chat",
+  "reviewer_kind": "human_user_chat_confirmation_not_expert_attestation",
+  "proposer": "AI_assisted_project_draft",
+  "user_message": "内容认可",
+  "package_sha256": "322bd50578a252fbc6a4f8ae6bce0e422af4e4fdda1e3c5633213f274b9d85f1",
+  "source_sha256": {
+    "bfd_detection_note.md": "cbe9e3832698a1e1fa5a554d337d6b8b1ae98fcf0cff2ec6757148564b525d7d",
+    "netconf_lock_candidate_note.md": "80ddb482d6927a813d2bade821e7e5568bd10ff11acc99607c4ef7629a391841"
+  },
+  "review_checklist": "docs/STAGE4_BFD_NETCONF_SOURCE_REVIEW_2026-09-29.md",
+  "recorded_date": "2026-09-29",
+  "exclusions": [
+    "RFC factual expert attestation",
+    "copyright or license clearance",
+    "semantic independence or frozen evaluation approval",
+    "source registration, ingestion, model calls or publication"
+  ],
+  "identity_limit": "Chat confirmation only; no fabricated real name, expert review or cryptographic identity verification."
+}

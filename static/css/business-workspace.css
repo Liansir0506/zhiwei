@@ -1,0 +1,29 @@
+/* 业务与集成：记录工作区（表格/详情）与受限面板；隔离工作区独立页面样式保留在下方。 */
+.business-list { margin-top: 4px; }
+.business-list .surface + .surface { margin-top: 10px; }
+.business-detail { margin-top: 14px; }
+.business-detail:empty { display: none; }
+.business-detail .detail-list { margin: 10px 0; font-size: 12.5px; }
+.business-detail .detail-list > div { display: grid; grid-template-columns: minmax(110px, 160px) minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--color-border-subtle); }
+.business-detail .detail-list dt { color: var(--muted); }
+.business-detail .detail-list dd { margin: 0; overflow-wrap: anywhere; }
+.business-access:empty { display: none; }
+.business-access .surface { margin-bottom: 10px; }
+
+/* 隔离只读工作区（business-isolated.html / 18021）沿用自有布局 */
+.isolated-shell{max-width:1280px;margin:0 auto;padding:24px;box-sizing:border-box}
+.isolated-top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.isolated-nav{display:flex;gap:12px;margin:18px 0}
+.isolated-notice{padding:14px;background:#fff7df;border-radius:8px}
+.isolated-key input{max-width:100%;width:360px;padding:10px;box-sizing:border-box}
+.isolated-shell [hidden]{display:none!important}
+.isolated-shell button,.isolated-shell select{font:inherit}
+.isolated-shell button{padding:10px 14px;border:1px solid #d5dfef;border-radius:8px;background:white;cursor:pointer}
+.isolated-shell button:disabled{cursor:default;opacity:.6}
+.isolated-shell .agent-form{margin:20px 0}
+.isolated-shell .knowledge-card{padding:18px;border:1px solid #dce4f0;border-radius:10px;background:white;overflow-wrap:anywhere}
+.isolated-shell .context-error{color:#b8392f}
+.isolated-shell .knowledge-meta{color:#65738c;overflow-wrap:anywhere}
+.isolated-shell .evidence-original{white-space:pre-wrap;overflow-wrap:anywhere}
+.isolated-shell .business-access{padding:16px;background:white;border-radius:12px}
+@media(max-width:600px){.isolated-shell{padding:14px}.business-controls{display:block}.business-fields>div{grid-template-columns:minmax(90px,1fr) minmax(0,2fr)}.business-detail{padding:12px}}

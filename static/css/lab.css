@@ -1,0 +1,32 @@
+/* 场景实验室：场景卡 + 步骤轨迹 + 角色网格 */
+#view-lab { overflow-wrap: anywhere; }
+.lab-scenario { padding: 18px 20px; margin-bottom: 14px; }
+.lab-scenario h3 { font-size: 15px; margin-bottom: 6px; }
+.lab-scenario > .ui-help { font-size: 12.5px; color: var(--muted); line-height: 1.8; margin: 0 0 12px; }
+.lab-trail { display: grid; gap: 4px; margin: 4px 0 12px; }
+.lab-step { display: flex; align-items: baseline; gap: 10px; padding: 8px 11px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--panel); font-size: 12.5px; }
+.lab-step-dot { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--line); color: #fff; font-size: 11px; flex: 0 0 auto; }
+.lab-step.ok .lab-step-dot { background: #1f9254; }
+.lab-step.fail .lab-step-dot { background: #c2402f; }
+.lab-step-label { font-weight: 600; }
+.lab-step-detail { color: var(--muted); font-size: 11.5px; margin-left: auto; text-align: right; }
+.lab-jobs { display: grid; gap: 10px; }
+.lab-dim { color: var(--muted); }
+.lab-role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 8px; margin: 8px 0 10px; }
+.lab-role { display: flex; justify-content: space-between; gap: 8px; padding: 9px 12px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--panel); font-size: 12.5px; }
+.lab-role.ok { border-color: #bfe3cd; background: #f2faf5; color: #17703f; }
+.lab-role b { font-size: 12px; }
+@media (max-width: 760px) {
+  .lab-step-detail { margin-left: 0; flex-basis: 100%; }
+  .lab-step { flex-wrap: wrap; }
+}
+
+/* 备份场景：表选择 */
+.lab-backup-choices { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 12px; }
+.lab-backup-choice { display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--panel); font-size: 12.5px; cursor: pointer; }
+.lab-backup-choice:has(input:checked) { border-color: var(--brand); background: var(--color-brand-50); color: var(--color-brand-600); }
+.lab-backup-choice input { accent-color: var(--brand); }

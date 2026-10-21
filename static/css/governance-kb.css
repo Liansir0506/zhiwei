@@ -1,0 +1,48 @@
+/* 知识治理：四 tab + FAQ 列表 + 回归网格 + 缺口闭环 */
+#view-gk { overflow-wrap: anywhere; }
+.gk-tabs { margin: 4px 0 16px; }
+.gk-tab { font: inherit; font-size: 12.5px; font-weight: 600; padding: 9px 16px; border: 1px solid var(--line);
+  border-radius:8px; background: var(--panel); color: var(--muted); cursor: pointer; }
+.gk-tab.active { background: var(--color-brand-50); color: var(--color-brand-600); border-color: var(--brand); }
+.gk-panel { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 14px; }
+.gk-qa-head { font-size: 12.5px; color: var(--muted); }
+.gk-faq-list { display: grid; gap: 6px; }
+.gk-faq-row { display: flex; align-items: center; gap: 12px; padding: 10px 13px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--panel); font-size: 12.5px; }
+.gk-faq-q { flex: 1 1 auto; min-width: 0; font-weight: 600; }
+.gk-faq-meta { flex: 0 0 auto; color: var(--muted); font-size: 11.5px; }
+.gk-table { width: 100%; }
+.gk-table th { font-size: 11.5px; }
+.gk-table td { font-size: 12.5px; }
+.gk-dim { color: var(--muted); }
+.gk-check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 8px; margin: 10px 0; }
+.gk-check { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); font-size: 12px; }
+.gk-check b { font-size: 12.5px; }
+.gk-check.ok { border-color: #bfe3cd; background: #f2faf5; color: #17703f; }
+.gk-check.warn { border-color: #f3d9a8; background: #fdf8ec; color: #9a6b12; }
+.gk-check.na { color: var(--muted); }
+.gk-check-ratio { font-size: 11px; }
+.gk-gap-block { padding: 16px 18px; }
+.gk-gap-block h3 { font-size: 14px; margin-bottom: 10px; }
+.gk-gap-list { margin: 6px 0; padding-left: 18px; font-size: 12.5px; line-height: 1.9; }
+.gk-gap-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; padding: 16px 18px; }
+.gk-gap-form h3 { grid-column: 1 / -1; font-size: 14px; }
+.gk-gap-form .action-row { grid-column: 1 / -1; justify-content: flex-end; }
+.gk-ops { display: flex; gap: 6px; flex-wrap: wrap; }
+.gk-ops .ui-btn { padding: 5px 10px; font-size: 11.5px; }
+@media (max-width: 760px) {
+  .gk-faq-row { flex-wrap: wrap; }
+  .gk-tabs { display: flex; }
+  .gk-tab { flex: 1 1 0; padding: 9px 8px; text-align: center; }
+}
+
+/* 问答差评问题单（T4） */
+.gk-issue { border: 1px solid var(--line); border-radius: 10px; padding: 10px 13px; margin-bottom: 8px; background: var(--panel); }
+.gk-issue-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.gk-issue-q { flex: 1 1 auto; min-width: 0; font-size: 12.5px; }
+.gk-issue-sec { font-size: 12px; margin: 6px 0 0; line-height: 1.8; }
+.gk-issue-sec.gk-dim { color: var(--muted); }
+.notice.ok { border-color: #bfe3cd; background: #f2faf5; color: #17703f; }
+
+.gk-tabs { gap:4px;flex-wrap:wrap; }
+.gk-close-form { display:grid;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line); }

@@ -1,0 +1,9 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AMF流程演练</title><link rel="stylesheet" href="exercise.css"><script src="source-binding.js"></script><script defer src="engine.js"></script><script defer src="workspace.js"></script></head><body><main>
+<header><div><p class="eyebrow">流程训练工作台</p><h1>AMF注册失败流程演练</h1><p>从取证、分支判断到停止、回退和恢复检查，操作对象只在本页内存中。</p></div><a href="sop-draft.md">查看流程草稿</a></header>
+<section class="toolbar"><label>练习场景 <select id="scenario"></select></label><button id="reset">重新开始</button><button id="export">导出演练记录</button></section>
+<p id="feedback" role="status" aria-live="polite"></p>
+<section class="status"><div><span>当前阶段</span><strong id="phase"></strong><p id="reason"></p></div><div><span>目标对象 / 模型版本</span><strong id="target"></strong><p id="revision"></p></div></section>
+<section><h2>执行步骤</h2><div class="actions"><button id="collect">1 采集记录</button><button id="review">2 判断分支</button><button id="confirm">3 确认本次演练动作</button><button id="execute">4 应用内存模型变更</button><button id="observe">5 检查下一观察窗</button><button id="stop" class="secondary">停止并核对回退</button></div><p>确认绑定当前对象、版本与变更前后值。对象或版本变化后，需要重新开始；确认记录仅用于本次练习。</p></section>
+<div class="columns"><section><h2>取证与同窗分母</h2><div id="evidence"></div><p class="small">“当前窗完成”与“历史排队完成”分开记录，避免把累计完成数当作当前窗分母。</p></section><section><h2>动作与回退计划</h2><div id="plan"></div><h3>恢复检查</h3><div id="observations"></div><p class="small">本例使用训练时钟和预设模型条件，满足两次连续合格窗才完成练习。</p></section></div>
+<section><h2>演练事件账本 <span id="audit-count"></span></h2><ol id="audit"></ol></section><section><h2>结果核对</h2><p id="outcome"></p><details><summary>查看结构化记录与来源引用</summary><pre id="json"></pre></details></section>
+</main></body></html>

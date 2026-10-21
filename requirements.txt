@@ -1,0 +1,33 @@
+# Web 框架与基础
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30
+psutil>=5.9,<8  # 本地演示进程的 PID/创建时间/启动命令归属校验
+pydantic>=2.7
+pydantic-settings>=2.3
+httpx>=0.27
+pyyaml>=6.0
+
+# 存储
+pymilvus>=2.5,<2.6
+sqlalchemy>=2.0
+pymysql>=1.1
+redis>=5.0
+
+# 解析（离线入库）
+pymupdf>=1.24
+sentencepiece>=0.2  # bge-reranker slow tokenizer 依赖
+python-docx>=1.1
+openpyxl>=3.1
+pandas>=2.2
+
+# 模型推理（阶段4起使用；6GB 显存建议 CPU/半精度）
+# 注意：Windows 上 torch 2.14 pypi 版存在 c10.dll DLL 初始化失败问题，钉 2.5.1 CPU 版
+torch==2.5.1
+# transformers>=4.53 拒绝 torch.load 加载 .bin（CVE-2025-32434），bge-m3 无 safetensors，故钉 4.46.3
+transformers==4.46.3
+sentence-transformers==3.2.1
+
+# 测试
+pytest>=8.2
+pytest-asyncio>=0.23
+prometheus_client>=0.21  # /metrics 监控端点（可选，缺失时优雅降级）

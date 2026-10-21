@@ -1,0 +1,85 @@
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --color-brand-50: #eff5ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+  --color-accent-500: #12a594;
+
+  /* Neutral */
+  --color-bg-canvas: #f5f7fb;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: #f8fafc;
+  --color-sidebar: #14233c;
+  --color-sidebar-raised: #233b62;
+  --color-sidebar-border: #2c3d57;
+  --color-text-primary: #19263d;
+  --color-text-secondary: #69778d;
+  --color-text-tertiary: #69778d;
+  --color-border: #e7ecf3;
+  --color-border-subtle: #eff2f7;
+  --color-success: #16855b;
+  --color-warning: #c77700;
+  --color-danger: #c43f4b;
+
+  /* Type */
+  --font-sans: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 26px;
+  --text-body: 14px;
+  --text-secondary: 13px;
+  --text-meta: 12px;
+  --line-height-body: 1.72;
+
+  /* Space and shape */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --surface-radius: var(--radius-lg);
+  --surface-pad: 20px 22px;
+  --control-h: 40px;
+  --sidebar-w: 216px;
+  --topbar-h: 68px;
+  --page-gutter: 32px;
+  --motion-fast: 140ms;
+  --motion-page: 180ms;
+  --motion-panel: 240ms;
+  --ease-ui: cubic-bezier(.2, .8, .2, 1);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+  --shadow-md: 0 12px 30px rgba(28, 39, 60, .08);
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, .16);
+
+  /* Compatibility aliases used by existing business views. */
+  --bg: var(--color-bg-canvas);
+  --panel: var(--color-bg-surface);
+  --sidebar: var(--color-sidebar);
+  --sidebar-ink: #c7d1e0;
+  --ink: var(--color-text-primary);
+  --muted: var(--color-text-secondary);
+  --brand: var(--color-brand-500);
+  --brand-ink: #fff;
+  --line: var(--color-border);
+  --ok: var(--color-success);
+  --warn: var(--color-warning);
+  --chip: var(--color-brand-50);
+}
+
+@media (min-width: 1600px) { :root { --sidebar-w: 232px; } }
+@media (max-width: 760px) {
+  :root { --page-gutter: 18px; --topbar-h: 60px; --control-h: 44px; --surface-pad: 16px; }
+}

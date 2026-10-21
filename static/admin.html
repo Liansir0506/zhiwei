@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>智维平台 · 运行状态</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: "Microsoft YaHei", system-ui, sans-serif; background: #f4f6fa; margin: 0; padding: 20px; color: #1f2329; }
+  h1 { font-size: 19px; display: flex; align-items: center; gap: 10px; }
+  h1 a { font-size: 13px; color: #2563eb; text-decoration: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 16px; }
+  .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; }
+  .panel h2 { font-size: 14px; margin: 0 0 10px; color: #2563eb; }
+  .row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed #f0f1f4; }
+  .row:last-child { border-bottom: 0; }
+  .row span:first-child { color: #8a919f; }
+  .ok { color: #16a34a; font-weight: 600; } .bad { color: #dc2626; font-weight: 600; }
+  .pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #eef2ff; color: #2563eb; margin-left: 6px; }
+  .pill.gray { background: #f1f3f6; color: #8a919f; }
+  pre { background: #f8fafc; border: 1px solid #eef0f3; border-radius: 8px; padding: 10px;
+        font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+  a.file { color: #2563eb; text-decoration: none; font-size: 12.5px; display: inline-block; margin: 2px 8px 2px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid #f0f1f4; }
+  th { color: #8a919f; font-weight: 500; }
+</style>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/workspace.css">
+</head>
+<body class="admin-page">
+<h1>智维平台 · 运行状态 <a href="/">← 返回工作台</a><span class="pill" id="env">ENV</span><span class="pill" id="refreshAt"></span></h1>
+<p id="adminStatus" class="context-note" role="status">使用当前凭据读取实时运行数据。</p>
+<div class="grid">
+  <div class="panel"><h2>🩺 组件健康</h2><div id="health">加载中…</div></div>
+  <div class="panel"><h2>🌿 知识库版本</h2><div id="kbv">加载中…</div></div>
+  <div class="panel"><h2>📥 入库统计（按类型）</h2><div id="ingest">加载中…</div></div>
+  <div class="panel"><h2>💬 使用量</h2><div id="usage">加载中…</div></div>
+  <div class="panel"><h2>⚠ Bad Case（open）</h2><div id="badcases">加载中…</div></div>
+  <div class="panel"><h2>🧠 LLM 与意图模型</h2><div id="llm">加载中…</div></div>
+  <div class="panel"><h2>📊 当前环境报告</h2><div id="reports">加载中…</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function row(k, v) { return `<div class="row"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`; }
+let requestEpoch=0;
+function clear(){for(const id of ["health","kbv","ingest","usage","badcases","llm","reports"])$(id).textContent="数据不可用";$("refreshAt").textContent="";$("env").textContent="—";}
+async function load() {
+  const turn=++requestEpoch;clear();
+  const key = localStorage.getItem("api_key") || "";
+  const headers = key ? {"X-API-Key":key} : {};
+  try {
+  const [r, hr] = await Promise.all([fetch("/admin/overview",{headers,cache:"no-store"}), fetch("/health")]);
+  if (turn!==requestEpoch||key !== (localStorage.getItem("api_key") || "")) return;
+  if (!r.ok || !hr.ok) throw new Error(r.status === 401 ? "请返回工作台设置有效的 API Key。" : r.status === 403 ? "当前账号没有运行状态页权限。" : "运行数据暂不可用，请稍后重试。");
+  const d = await r.json();
+  const h = await hr.json();
+  if(turn!==requestEpoch||key!==(localStorage.getItem("api_key")||""))return;
+  $("env").textContent = (h.environment || "dev").toUpperCase();
+  $("health").innerHTML = Object.entries(d.health).map(([k, v]) =>
+    row(k, v)).join("");
+  $("kbv").innerHTML = d.kb_versions.map(v => row(v.version,
+    v.status + (v.published_at ? " · " + v.published_at.slice(0,10) : ""))).join("");
+  $("ingest").innerHTML = `<details><summary>历史入库明细（${d.ingest_stats.length}个版本/类型分组）</summary><table><tr><th>版本</th><th>类型</th><th>文件</th><th>chunks</th><th>失败</th></tr>` +
+    d.ingest_stats.map(s => `<tr>${[s.kb_version,s.doc_type,s.files,s.chunks,s.failed].map(v=>`<td>${esc(v)}</td>`).join("")}</tr>`).join("") + "</table></details>";
+  $("usage").innerHTML = row("会话数", d.sessions_total) + row("消息数", d.messages_total) +
+    row("反馈 👍 / 👎", `${d.feedback.up || 0} / ${d.feedback.down || 0}`);
+  $("badcases").innerHTML = row("open / 总数", `${d.bad_cases.open} / ${d.bad_cases.total}`) +
+    (d.recent_bad_cases.slice(0, 5).map(b => row(b.cause || "未标注", b.query_text.slice(0,26))).join("") || "");
+  $("llm").innerHTML = row("LLM 地址", d.llm.base_url) + row("模型", d.llm.model) +
+    row("意图模型", "models/bert_intent_classifier_v1");
+  $("reports").innerHTML = d.reports.map(f => `<span class="file">${esc(f)}</span>`).join("") || "暂无报告";
+  $("refreshAt").textContent = "刷新于 " + new Date().toLocaleTimeString();
+  $("adminStatus").textContent = `读取时间：${d.snapshot?.at||new Date().toISOString()} · 数据库全局历史记录；进程计数重启后重置。文档生成${h.generation_enabled?"开启":"关闭"}，Agent${h.agent_enabled?"开启":"关闭"}；仅供本地场景验证，不代表独立质量通过。`;
+  } catch(error) {
+    if(turn!==requestEpoch||key!==(localStorage.getItem("api_key")||""))return;clear();
+    $("adminStatus").textContent = error.message || "运行数据读取失败。";
+    for (const id of ["health","kbv","ingest","usage","badcases","llm","reports"]) $(id).textContent = "数据不可用";
+  }
+}
+window.addEventListener("storage",e=>{if(e.key==="api_key")load();});
+load(); setInterval(load, 30000);
+</script>
+</body>
+</html>

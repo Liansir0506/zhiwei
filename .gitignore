@@ -1,0 +1,33 @@
+# Local environments and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+api-key*.txt
+# Dependencies / models
+.venv/
+venv/
+node_modules/
+models/*
+!models/.gitkeep
+# Local state, corpora, reports and private evaluation sets
+.runtime/
+data/*
+!data/raw/
+data/raw/*
+!data/raw/.gitkeep
+reports/*
+!reports/.gitkeep
+eval_sets/*
+!eval_sets/.gitkeep
+__pycache__/
+*.py[cod]
+*.log
+.pytest_cache/
+.test-cache/
+.test-tmp*/
+.idea/
+.vscode/
+volumes/
+test-results/

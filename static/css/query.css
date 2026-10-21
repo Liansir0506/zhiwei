@@ -1,0 +1,65 @@
+/* 查询工作台：输入 → 计划预览 → 结果 */
+#view-query { overflow-wrap: anywhere; }
+.qinput-row { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; margin: 22px 0 12px; padding:20px; }
+.qinput-row textarea { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 14px; line-height: 1.7; padding: 11px 13px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); resize: vertical; }
+.qinput-row button { justify-self:end; }
+.qexamples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.qexamples-label { font-size: 12px; color: var(--muted); }
+.qexample { font: inherit; font-size: 12px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel); color: var(--ink); cursor: pointer; }
+.qexample:hover { border-color: var(--brand); color: var(--color-brand-600); }
+.query-status { margin: 0 0 12px; }
+.qspec-box { padding: 16px 18px; margin-bottom: 14px; }
+.qspec-table { width: 100%; }
+.qspec-table td { font-size: 12.5px; padding: 8px 10px; vertical-align: top; }
+.qspec-key { width: 96px; color: var(--muted); white-space: nowrap; }
+.qspec-box .tech-details { margin-top: 10px; }
+.qspec-limit { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12.5px; }
+.qspec-limit input { width: 90px; font: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--panel); color: var(--ink); }
+.qspec-hint { font-size: 11.5px; color: var(--muted); }
+.qresult { display: grid; gap: 12px; }
+.qresult-table { width: 100%; }
+.qresult-table th { font-size: 11.5px; white-space: nowrap; }
+.qresult-table td { font-size: 12.5px; white-space: nowrap; }
+.qresult-table td.qresult-id { font-weight: 600; }
+@media (max-width: 760px) {
+  .qinput-row { flex-direction: column; }
+  .qinput-row button { width: 100%; }
+  .qresult-table { display: block; overflow-x: auto; }
+}
+
+/* 常用统计（T5） */
+.qstats { margin-top: 18px; }
+.qstats .ui-help { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+.qstats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.qstat-card { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--panel); display: grid; gap: 8px; }
+.qstat-card h4 { font-size: 12.5px; margin: 0; }
+.qstat-numbers { display: flex; flex-wrap: wrap; gap: 12px; }
+.qstat-number { display: grid; gap: 2px; }
+.qstat-number b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.qstat-number span { font-size: 11px; color: var(--muted); }
+.qstat-formula { font-size: 11px; color: var(--muted); margin: 0; line-height: 1.6; }
+.qstat-scope { font-size: 11px; color: var(--muted); margin: 0; }
+.qstat-link { justify-self: start; }
+
+.qstat-window { font-size: 11px; color: var(--muted); margin: 0; }
+.query-boundary { margin: 0 0 12px; }
+.query-boundary summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.query-boundary .ui-help { font-size: 12px; color: var(--muted); margin: 6px 0 0; line-height: 1.7; }
+
+.query-modes { margin-bottom:24px; }
+.query-intro h2,.query-custom > h2 { font-size:20px;margin-bottom:8px; }
+.query-custom { max-width:960px; }
+.qstats { margin-top:0; }
+.qstats-grid { margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px; }
+.qstat-card { border-radius:var(--radius-lg);padding:22px;gap:14px; }
+.qstat-card h4 { font-size:15px; }
+.qstat-number b { font-size:24px; }
+.qstat-card .tech-details { margin-top:auto; }
+.qspec-box h2 { font-size:18px;margin-bottom:8px; }
+.qresult { margin-top:22px; }
+#queryExecuteRow { margin-top:18px; }
+@media(max-width:760px) { .qstats-grid { grid-template-columns:1fr; }.qinput-row { padding:16px; } }
+

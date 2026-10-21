@@ -1,0 +1,87 @@
+name: telecom_ops
+routes: [direct_answer, faq_exact, structured_lookup, retrieval]
+
+thresholds:
+  # faq_direct 实测校准：r3 的 25 条 FAQ 原句反查 top1 dense 分布为
+  # min 0.8703 / median 0.8881 / max 0.9073，全部高于 0.80，故 0.80 无需下调。
+  # 注意：真正生效的是本文件，.env 里的 FAQ_DIRECT 未被代码读取（已同步为同值避免误导）。
+  faq_direct: 0.80
+  # faq_gap 已废弃（_faq_direct_ok 不再读取）：r3 模拟 FAQ 由模板生成、高度同质，
+  # 实测 top1-top2 分差恒在 0.0002~0.0099，0.05 的门槛会 100% 挡掉直出，
+  # 使所有 FAQ 问句降级 retrieval，而 search_docs 不查 faq_collection → 一律拒答。
+  faq_gap: 0.05
+  rerank_min: 0.30
+  rule_gray_zone: [0.40, 0.70]   # 规则 score 落此区间才触发模型通道
+  model_timeout_ms: 200
+  model_faq_prob: 0.60      # 模型 FAQ_QUERY 概率超过此值才给 faq_exact 候选
+
+greeting_patterns: ["^(你好|您好|hi|hello|在吗|早上好|下午好|晚上好|嗨)[!！。～~ ]*$"]
+# 前两条是旧格式（ALM-1234 / ALM1234），第三条是 r3 数据实际使用的字母分段码
+# （ALM-SMF-PDU、ALM-UDM-AUTH、ALM-NGAP-SCTP、ALM-NR-HO …）。
+# 此前只有前两条，导致 r3 的告警码一个都匹配不到，structured_lookup 通道对 r3 完全失效
+# （评测集 16/16 路由与命中均为 0，见 docs/STEP7_BASELINE.md）。
+# 注意 find_alarm_code 是对 query.upper() 做 search，因此大小写不敏感；
+# 段长限制在 2~10 是为了避免把普通英文短语误判成告警码。
+alarm_code_patterns:
+  - "ALM-\\d{4}"
+  - "ALM\\d{4}"
+  - "ALM-[A-Z0-9]{2,10}(?:-[A-Z0-9]{2,10})*"
+injection_patterns:
+  - "忽略(以上|之前|上面的)?(所有|全部)?(指令|提示|内容|设定)"
+  - "你现在是"
+  - "system:"
+  - "ignore (all )?previous"
+out_of_scope_patterns:
+  - "写.{0,10}(代码|程序|脚本)"
+  - "天气预报"
+  - "股票|基金|理财"
+  - "(重启|关闭|下电).{0,24}(基站|网元|设备|小区)"
+  - "帮我(操作|下发|执行)"
+  # 上面那条只覆盖"动作在前、对象在后"的语序；"把上海基站的电源远程下电"这类
+  # 对象在前的危险指令会漏拦截（评测集 G04 已如实暴露）。
+  # 这里要求前缀带祈使标记（把/给/将/帮我/替我），以避开"基站下电告警怎么处理"
+  # 这类正常知识问题——否则会把知识咨询误判成越界指令。
+  # 窗口放到 20：危险指令里常夹着告警码（如"把ALM-PWR-LOW对应的基站远程下电"），
+  # 窗口太小会让"带告警码的危险指令"绕过拦截。
+  - "(把|给|将|帮我|替我).{0,20}(基站|网元|设备|小区).{0,20}(重启|关闭|下电)"
+
+keyword_rules:
+  # 补入通用疑问词：r3 的 FAQ 问句多为"…应先核对什么/包含哪些…"这类措辞，
+  # 原词表只有"是什么/处理"等短语，导致 score=0 → 判成 knowledge → 不查 faq_collection。
+  faq:            {"排查步骤": 1.0, "怎么处理": 0.8, "如何处理": 0.8, "处理方法": 0.8, "怎么办": 0.8, "处理思路": 0.7, "多少": 0.5, "范围": 0.5, "门限": 0.7, "阈值": 0.7, "正常": 0.4, "要求": 0.4, "定义": 0.5, "是什么": 0.4, "什么": 0.5, "哪些": 0.5, "为什么": 0.6, "核对": 0.5, "上下文": 0.4}
+  fault_diagnosis: {"告警": 0.8, "故障": 0.7, "根因": 0.8, "定位": 0.5, "中断": 0.6, "掉电": 0.8, "退服": 0.8, "驻波": 0.8, "掉话": 0.8, "异常": 0.5}
+  config_query:   {"配置": 0.8, "参数": 0.7, "如何设置": 0.9, "设置": 0.5, "模板": 0.5, "规格": 0.6}
+  procedure_query: {"流程": 0.8, "SOP": 0.9, "应急": 0.8, "抢修": 0.8, "应急预案": 0.9, "操作票": 0.9}
+
+hybrid_weights:
+  default: {dense: 0.6, sparse: 0.4}
+  fault_case: {dense: 0.5, sparse: 0.5}
+
+filters_by_intent:
+  fault_diagnosis: {doc_type_priority: [fault_case, guide]}
+  procedure_query: {doc_type_priority: [sop, faq]}
+  config_query:    {doc_type_priority: [manual, standard]}
+  faq:             {doc_type_priority: [faq, sop]}
+
+abbreviations:
+  BBU: 基带处理单元
+  AAU: 有源天线单元
+  RRU: 射频拉远单元
+  SPN: 切片分组网
+  OTN: 光传送网
+  UPF: 用户面功能
+  SMF: 会话管理功能
+  WTR: 等待恢复时间
+  VSWR: 电压驻波比
+
+limits:
+  query_max_chars: 500
+  user_qps: 5
+  global_concurrency: 50
+
+timeouts_ms:
+  rewrite: 300
+  retrieval: 800
+  rerank: 500
+  llm_first_token: 3000
+  llm_total: 30000

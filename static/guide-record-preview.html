@@ -1,0 +1,11 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>指南候选预览</title><link rel="stylesheet" href="/guide-preview.css"><script defer src="/guide-preview.js"></script></head><body><main>
+<header><div><h1>修订指南候选预览</h1><p>test-sop-records-r2 <span class="badge">STAGED · 只读</span></p></div><button id="logout" hidden>退出预览</button></header>
+<p class="notice">仅供隔离本地演示的20份取证与交接指南。生成回答与 Agent 已关闭；普通发布门禁未通过，完整现场处置与独立质量仍待补。</p>
+<section id="login"><h2>管理员访问</h2><p>通过本机私有登录页进入，或填写此隔离候选的管理员凭据。原平台凭据不通用。</p><form id="login-form"><label>预览凭据 <input id="key" type="password" autocomplete="off" required></label><button>进入</button></form></section>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="workspace" hidden><nav aria-label="预览内容"><button data-tab="catalog" aria-selected="true">指南目录</button><button data-tab="search" aria-selected="false">证据检索</button><button data-tab="checks" aria-selected="false">检查与缺口</button><button data-tab="support" aria-selected="false">SOP支持性对齐</button></nav>
+<section id="catalog"><h2>指南目录 <span id="count"></span></h2><p>查看具体指南的原文片段；标题与片段来自当前已准入候选。</p><div id="catalog-items" class="grid"></div></section>
+<section id="search" hidden><h2>检索指南证据</h2><form id="search-form"><label for="query">问题或取证线索</label><div class="search-row"><input id="query" maxlength="500" required placeholder="输入需要查证的问题"><button id="search-button">检索</button></div></form><p>检索结果提供原文证据，不生成处置答案。无证据时会明确提示。</p><div id="search-results"></div></section>
+<section id="checks" hidden><h2>适用检查与发布缺口</h2><div id="check-results"></div><h3>普通发布门禁</h3><div id="gate-results"></div><ul id="gaps"></ul></section>
+<section id="support" hidden><h2>SOP与修订指南的逐项对齐</h2><p>查看新增取证要求及原文。文字补齐后，实际记录、设备依据与动作授权仍需核对。</p><label>筛选专题 <input id="support-filter" type="search" placeholder="如 AMF、LTE、光路"></label><p id="support-count" role="status"></p><div id="support-summary"></div><div id="support-entries"></div></section><section id="source-panel" hidden><h2>原文核对</h2><p id="source-meta"></p><pre id="source-text"></pre></section></div>
+</main></body></html>

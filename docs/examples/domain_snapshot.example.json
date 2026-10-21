@@ -1,0 +1,38 @@
+{
+  "tenants": [
+    {"tenant_id": "demo-telecom", "name": "示例通信公司", "status": "active"}
+  ],
+  "departments": [
+    {"dept_id": "demo-ops", "tenant_id": "demo-telecom", "name": "网络运维部"}
+  ],
+  "users": [
+    {"user_id": "demo-engineer", "tenant_id": "demo-telecom", "username": "engineer01", "display_name": "示例工程师"}
+  ],
+  "user_departments": [
+    {"user_id": "demo-engineer", "dept_id": "demo-ops", "is_primary": true}
+  ],
+  "devices": [
+    {"device_id": "demo-device-001", "tenant_id": "demo-telecom", "dept_id": "demo-ops", "cmdb_id": "CMDB-001", "name": "示例 5G BBU", "device_type": "BBU", "vendor": "华为", "network_tech": "5G"}
+  ],
+  "monitoring_metrics": [
+    {"observation_id": "demo-metric-001", "tenant_id": "demo-telecom", "device_id": "demo-device-001", "metric_name": "optical_rx_power", "metric_value": -18.6, "unit": "dBm", "sampled_at": "2026-09-19T09:01:00", "source_system": "monitoring-platform"}
+  ],
+  "alarms": [
+    {"alarm_id": "demo-alarm-001", "tenant_id": "demo-telecom", "device_id": "demo-device-001", "alarm_code": "ALM-1201", "severity": "critical", "source_system": "alarm-platform", "occurred_at": "2026-09-19T09:00:00"}
+  ],
+  "work_orders": [
+    {"ticket_id": "demo-ticket-001", "tenant_id": "demo-telecom", "dept_id": "demo-ops", "device_id": "demo-device-001", "alarm_id": "demo-alarm-001", "title": "传输中断处置", "priority": "P1", "source_system": "ticket-system", "opened_at": "2026-09-19T09:05:00", "assignee_user_id": "demo-engineer"}
+  ],
+  "changes": [
+    {"change_id": "demo-change-001", "tenant_id": "demo-telecom", "dept_id": "demo-ops", "device_id": "demo-device-001", "ticket_id": "demo-ticket-001", "title": "光模块更换", "change_type": "hardware", "status": "approved", "source_system": "change-system", "window_start": "2026-09-19T10:00:00", "window_end": "2026-09-19T11:00:00", "operator_user_id": "demo-engineer"}
+  ],
+  "knowledge_assets": [
+    {"asset_id": "demo-asset-001", "tenant_id": "demo-telecom", "dept_id": "demo-ops", "filename": "sop_transmission.md", "doc_type": "sop", "source_system": "confluence", "source_id": "PAGE-1001", "source_version": "3.2", "security_level": "internal", "visibility": "role_restricted", "role_scope": ["ops"], "status": "active", "effective_from": "2026-01-01T00:00:00", "kb_version": "demo-v1"}
+  ],
+  "knowledge_relations": [
+    {"asset_id": "demo-asset-001", "relation_type": "device", "relation_id": "demo-device-001"},
+    {"asset_id": "demo-asset-001", "relation_type": "alarm", "relation_id": "demo-alarm-001"},
+    {"asset_id": "demo-asset-001", "relation_type": "work_order", "relation_id": "demo-ticket-001"},
+    {"asset_id": "demo-asset-001", "relation_type": "change", "relation_id": "demo-change-001"}
+  ]
+}

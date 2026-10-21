@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智维平台 · 运维问答</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/workspace.css">
+<link rel="stylesheet" href="/static/css/dashboard.css">
+<link rel="stylesheet" href="/static/css/dashboard-v2.css">
+<link rel="stylesheet" href="/static/css/agent-workspace.css">
+<link rel="stylesheet" href="/static/css/business-workspace.css">
+<link rel="stylesheet" href="/static/css/ui.css">
+<link rel="stylesheet" href="/static/css/governance-kb.css">
+<link rel="stylesheet" href="/static/css/query.css">
+<link rel="stylesheet" href="/static/css/lab.css">
+<link rel="stylesheet" href="/static/css/version-workspace.css">
+<link rel="stylesheet" href="/static/css/alerts.css">
+<link rel="stylesheet" href="/static/css/devices.css">
+<link rel="stylesheet" href="/static/css/shell.css">
+<link rel="stylesheet" href="/static/css/motion.css">
+<script>
+  /* 侧栏宽度：在正文绘制前恢复，避免先按默认宽度画一遍再跳动 */
+  try {
+    var savedSidebarWidth = parseInt(localStorage.getItem('ui.sidebar_width_v1'), 10);
+    if (savedSidebarWidth >= 200 && savedSidebarWidth <= 320) {
+      document.documentElement.style.setProperty('--sidebar-w', savedSidebarWidth + 'px');
+    }
+  } catch (e) {}
+</script>
+</head>
+<body data-tab="dashboard">
+<a class="skip-link" href="#mainContent">跳到主要内容</a>
+<aside id="workspaceSidebar" class="workspace-sidebar" aria-label="工作台导航">
+  <div class="logo brand-lockup"><span class="brand-mark" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#spark"></use></svg></span><span class="brand-copy"><strong>智维平台</strong><small>通信运维知识助手</small></span></div>
+  <nav class="side-nav" aria-label="功能">
+    <div class="nav-group-label">工作台</div>
+    <button class="nav-item active" data-tab="dashboard" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#grid"></use></svg></span>总览看板</button>
+    <button class="nav-item" data-tab="alerts"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#activity"></use></svg></span>告警与资源</button>
+    <button class="nav-item" data-tab="agent"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#target"></use></svg></span>诊断工作台</button>
+    <button class="nav-item" data-tab="qa"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#spark"></use></svg></span>运维问答</button>
+    <button class="nav-item" data-tab="query"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#chart"></use></svg></span>业务查询</button>
+    <div class="nav-group-label">知识管理</div>
+    <button class="nav-item" data-tab="kb"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#book"></use></svg></span>知识库</button>
+    <div class="nav-group-label" id="governanceNavHeading" hidden>管理设置</div>
+    <button class="nav-item" data-tab="ops" hidden><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#clock"></use></svg></span>运行状态</button>
+    <button class="nav-item" data-tab="eval" hidden><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#clipboard"></use></svg></span>评测记录</button>
+    <button class="nav-item" data-tab="perm" hidden><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#shield"></use></svg></span>访问管理</button>
+    <button class="nav-item" data-tab="business" hidden><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#plug"></use></svg></span>集成状态</button>
+    <div class="nav-group-label" id="versionNavHeading" hidden>开发工具</div>
+    <button class="nav-item" data-tab="lab"><span class="nav-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#flask"></use></svg></span>场景实验室</button>
+    <p class="capability-note" id="capabilitiesStatus" role="status">正在核对可用功能…</p>
+    <button class="capability-retry" id="capabilitiesRetry" type="button">刷新可用功能</button>
+  </nav>
+  <!-- 知识管理的内部子页签（其余四个视图共用该条） -->
+  <nav class="side-subnav" id="knowledgeSubnav" aria-label="知识管理子页签" hidden>
+    <button class="subnav-item is-active" data-subtab="kb">知识浏览</button>
+    <button class="subnav-item" data-subtab="docs">上传资料</button>
+    <button class="subnav-item" data-subtab="gk">待处理问题</button>
+    <button class="subnav-item" data-subtab="versions">版本与发布</button>
+  </nav>
+
+  <!-- 会话/推荐/告警速查已移入问答视图：全局侧栏只保留模块导航，保证宽度与品牌高度稳定 -->
+
+  <div class="side-foot">
+    <div class="row"><span>版本</span><span id="kbVer">—</span></div>
+    <div class="row"><span>认证</span>
+      <button id="keyBtn">设置 API Key</button></div>
+  </div>
+  <div class="sidebar-resizer" id="sidebarResizer" role="separator" aria-orientation="vertical"
+       aria-label="调整侧栏宽度" aria-valuemin="200" aria-valuemax="320" aria-valuenow="216"
+       tabindex="0" title="拖动调整侧栏宽度；双击恢复默认"></div>
+</aside>
+
+<div id="workspaceMask" class="workspace-mask" hidden></div>
+<main id="mainContent" tabindex="-1">
+  <header class="top">
+    <button class="burger" id="burger" title="收起/展开侧边栏" aria-label="收起/展开侧边栏" aria-controls="workspaceSidebar" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#menu"></use></svg></button>
+    <div class="top-crumb"><span class="page-breadcrumb" id="pageCrumb">工作台 /</span><span id="pageTitle">总览看板</span></div>
+    <form class="top-search" id="globalSearchForm" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.2 4.2"></path></svg>
+      <input id="globalSearch" placeholder="搜索告警、设备、工单…" maxlength="80" autocomplete="off" aria-label="全局搜索">
+      <kbd>Ctrl K</kbd>
+    </form>
+    <div class="top-actions">
+      <span class="conn" title="连接状态"><span class="dot" id="dot"></span><span id="status">检查连接…</span></span>
+
+      <span class="env-badge" id="envBadge" data-env="dev">DEV</span>
+      <button class="top-icon" id="notifyBtn" type="button" aria-label="待办通知" title="待办通知">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4 1.5 5.2 1.5 5.2H5s1.5-1.2 1.5-5.2Z"></path><path d="M10 18a2.2 2.2 0 0 0 4 0"></path></svg>
+        <i class="notify-dot" id="notifyDot" hidden></i>
+      </button>
+      <button class="top-icon" id="guideBtn" type="button" aria-label="演示导览" title="演示导览"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#help"></use></svg></button>
+      <button class="avatar" id="avatarBtn" type="button" aria-label="当前账号" title="当前账号">运</button>
+      <button class="burger" id="exportBtn" title="导出当前会话为 Markdown" aria-label="导出当前会话"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#download"></use></svg></button>
+      <button class="burger" id="burgerR" title="收起/展开上下文与证据" aria-label="上下文与证据"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="/static/icons.svg#panel"></use></svg></button>
+    </div>
+  </header>
+
+  <section id="view-qa" class="tabview">
+  <header class="page-head"><div><h1>运维问答</h1><p class="page-head-note">描述问题，获取回答；关键结论可查看原文依据。</p></div><div class="page-head-actions"><button class="ui-btn" id="qaHistoryBtn" type="button">历史会话</button><button class="ui-btn" id="newConversation">＋ 新建会话</button></div></header>
+  <div class="workspace-tabs" aria-label="问答辅助视图">
+    <button class="selected" id="conversationTab">对话</button>
+    <button id="evidenceTab">引用来源<span class="count-pill" id="evidenceCount">0</span></button>
+    <button id="requestTab">请求详情</button>
+  </div>
+  <div class="qa-layout">
+  <div class="qa-main">
+  <div id="chat">
+    <div class="welcome"></div>
+  </div>
+
+  <div class="composer-area">
+  <form id="f">
+    <textarea id="q" rows="1" autocomplete="off"
+      aria-label="运维问题" placeholder="继续提问，或补充设备、版本与故障现象…" maxlength="500"></textarea>
+    <button id="send" class="ui-btn primary">发送</button>
+    <span class="muted" id="charHint" style="align-self:flex-end"></span>
+  </form>
+  <div class="qa-question-scope"><label for="qaVersion">知识版本</label>      <select id="qaVersion" aria-label="问答知识版本" title="待发布版本仅管理员可预览；不改变激活版本" style="border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:11px;padding:4px">
+        <option value="">当前激活版本</option>
+      </select></div>
+  <div class="composer-note"><span>回答以所选知识版本为依据 · Enter发送 / Shift+Enter换行</span><span>本地场景验证</span></div>
+  </div><!-- /composer-area -->
+  </div><!-- /qa-main -->
+  <aside class="right" aria-label="上下文与证据">
+    <div class="context-card-title"><h2>上下文与证据</h2><button class="subtle-button context-close" id="contextClose" aria-label="关闭上下文">×</button></div>
+    <section class="context-card">
+      <div class="context-card-title"><h3>知识版本</h3><span class="env-badge" id="contextEnv">—</span></div>
+      <div class="drow"><span>当前回答</span><strong id="dKb">—</strong></div>
+      <p class="version-note" id="versionNote">使用当前激活版本</p>
+    </section>
+    <section class="context-card" id="businessPanel">
+      <div class="context-card-title"><h3>业务上下文</h3><span class="muted">只读查询</span></div>
+      <form class="context-form" id="contextForm">
+        <select id="contextKind" aria-label="上下文类型"><option value="alarm">告警</option><option value="device">设备</option></select>
+        <input id="contextId" aria-label="告警或设备ID" placeholder="输入告警ID" maxlength="128" required
+               role="combobox" aria-expanded="false" aria-controls="contextSuggest" aria-autocomplete="list">
+        <button id="contextLookup" class="ui-btn primary" type="submit">查询</button>
+      </form>
+      <div id="contextSuggest" class="context-suggest" role="listbox" aria-label="告警或设备联想" hidden></div>
+      <div id="businessContent" aria-live="polite"><div class="empty-state"><strong>尚未关联业务对象</strong>输入告警或设备ID，查看授权范围内的上下文。</div></div>
+    </section>
+    <section class="context-card" id="evidencePanel">
+      <div class="context-card-title"><h3>引用证据</h3><span class="count-pill" id="contextEvidenceCount">0</span></div>
+      <div id="evidenceList"><div class="empty-state"><strong>还没有引用来源</strong>回答完成后，引用来源会显示在这里。</div></div>
+      <div id="evidenceDetail" aria-live="polite"></div>
+    </section>
+    <details id="requestDetails">
+      <summary>请求详情与运行记录</summary>
+      <select id="transportMode" aria-label="问答通道" title="流式输出（默认）；兼容通道用于排查" style="border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:11px;padding:4px">
+        <option value="sse">流式输出（默认）</option><option value="ws">兼容通道</option>
+      </select>
+      <span class="legend">路由图例：<b>faq_exact</b> FAQ直出 · <b>structured_lookup</b> 告警码 · <b>retrieval</b> 检索 · <b>direct_answer</b> 直答</span>
+      <div class="drow"><span>会话</span><strong id="dSess">—</strong></div>
+      <h3>最近一次回答</h3>
+      <div id="answerDiag"><div class="drow"><span>等待首次提问</span><strong>—</strong></div></div>
+      <h3>链路时间线</h3><div class="pipeline" id="pipeDiag"><div class="pstep">等待提问…</div></div>
+      <h3>耗时分布</h3><div class="perf" id="perfDiag"><div class="drow"><span>尚未测量</span><strong>—</strong></div></div>
+    </details>
+    <div class="quick-links"><a href="/admin" target="_blank" rel="noopener">运维状态页 ↗</a><a href="/docs" target="_blank" rel="noopener">接口文档 ↗</a></div>
+  </aside>
+  </div><!-- /qa-layout -->
+
+  <!-- 历史会话抽屉（问答局部，不再占据全局侧栏） -->
+  <div class="sess-mask" id="sessMask" hidden></div>
+  <aside class="sess-drawer" id="sessDrawer" aria-label="历史会话" hidden>
+    <div class="sess-drawer-head"><strong>历史会话</strong>
+      <span class="sess-drawer-actions"><button id="sessMgr" class="ui-btn sm sess-mgr-btn">管理</button>
+      <button id="sessDrawerClose" class="subtle-button" aria-label="关闭会话列表">×</button></span></div>
+    <div class="sess-tools" id="sessTools">
+      <span id="sessSelCount">已选 0</span>
+      <button id="sessAll" class="ui-btn sm">全选</button>
+      <button id="sessDel" class="ui-btn sm danger">删除所选</button>
+    </div>
+    <div id="sessList"></div>
+    <button class="newbtn" id="newBtn" hidden>＋ 新建会话</button>
+  </aside>
+  </section>
+
+  <section id="view-dashboard" class="tabview active" aria-label="总览看板">
+    <header class="page-head">
+      <div><h1>总览看板</h1><p class="page-head-note">先处理待办，再查看当前范围内的资源与趋势。</p></div>
+      <div class="page-head-actions"><button id="dashRefresh" type="button" class="subtle-button">刷新</button></div>
+    </header>
+    <div id="dashboardBody"><div class="dash-empty">正在读取平台数据…</div></div>
+  </section>
+
+  <section id="view-query" class="tabview" aria-label="查询工作台">
+    <header class="page-head">
+      <div><h1>业务查询</h1><p class="page-head-note">查看常用统计，或描述需求后核对条件再查询。</p></div>
+      <div class="page-head-actions"><button class="ui-btn" id="queryBoundaryBtn" type="button">查询边界</button></div>
+    </header>
+    <details class="tech-details query-boundary" id="queryBoundary">
+      <summary>只读查询边界说明</summary>
+      <p class="ui-help">仅告警 / 设备 / 工单 / 变更 / 监控指标五张表；字段按角色白名单校验；强制按当前租户与授权范围过滤；单次最多 200 行；仅 SELECT，全程留审计。聚合类需求请用固定统计卡。</p>
+    </details>
+    <div id="queryBody"></div>
+  </section>
+
+  <section id="view-alerts" class="tabview" aria-label="告警中心">
+    <header class="page-head">
+      <div><h1>告警与资源</h1><p class="page-head-note">核对异常，继续诊断、工单处理与恢复验证。</p></div>
+      <div class="page-head-actions"><button id="alertsExport" type="button" class="ui-btn">导出 CSV</button><button id="alertsRefresh" type="button" class="ui-btn primary">刷新</button></div>
+    </header>
+    <div class="sub-tabs" id="alertsSubtabs" role="tablist" aria-label="告警与资源">
+      <button class="sub-tab is-active" type="button" data-alertstab="alerts" role="tab" aria-selected="true">告警</button>
+      <button class="sub-tab" type="button" data-alertstab="tickets" role="tab" aria-selected="false">工单</button>
+      <button class="sub-tab" type="button" data-alertstab="devices" role="tab" aria-selected="false">设备</button>
+    </div>
+    <div id="alertsPane" data-pane="alerts"></div>
+    <div id="devicesPane" data-pane="devices" hidden></div>
+    <div id="ticketsPane" data-pane="tickets" hidden></div>
+    <div id="alertsDetail" hidden></div>
+    <div id="alertsListView">
+    <div id="alertsSummary" class="alert-summary"></div>
+    <form id="alertsFilter" class="filter-bar">
+      <input id="alertsQuery" class="ui-input grow" maxlength="80" placeholder="搜索告警、设备或关键词" aria-label="搜索告警">
+      <select id="alertsSeverity" class="ui-select" aria-label="告警级别">
+        <option value="">全部级别</option><option value="critical">紧急</option><option value="major">重要</option><option value="minor">次要</option><option value="warning">警告</option>
+      </select>
+      <select id="alertsStatusFilter" class="ui-select" aria-label="处置状态">
+        <option value="">全部状态</option><option value="open">未处理</option><option value="acknowledged">已确认</option><option value="cleared">已清除</option><option value="closed">已关闭</option>
+      </select>
+      <details class="alert-extra-filters"><summary>更多筛选</summary><div class="alert-extra-fields">
+      <select id="alertsType" class="ui-select" aria-label="设备类型"><option value="">全部设备类型</option></select>
+      <label class="ui-field date-field"><span class="ui-label">发生起</span><input id="alertsFrom" class="ui-input" type="date" aria-label="发生时间起点"></label>
+      <label class="ui-field date-field"><span class="ui-label">发生止</span><input id="alertsTo" class="ui-input" type="date" aria-label="发生时间终点"></label>
+      </div></details>
+      <button class="ui-btn primary" type="submit">查询</button>
+      <button class="ui-btn" type="button" id="alertsReset">重置</button>
+    </form>
+    <p id="alertsStatus" class="meta-line" role="status"></p>
+    <section class="surface alert-panel">
+      <div class="table-wrap" id="alertsTable"></div>
+      <div class="alert-foot">
+        <span id="alertsCount" class="meta-line"></span>
+        <div class="pager"><button id="alertsPrev" class="ui-btn sm" type="button">上一页</button><span id="alertsPage" class="meta-line"></span><button id="alertsNext" class="ui-btn sm" type="button">下一页</button></div>
+      </div>
+    </section>
+    </div><!-- /alertsListView -->
+  </section>
+
+  <dialog id="alertDlg" class="ui-dialog alert-dialog"><div id="alertDlgBody"></div></dialog>
+
+  <section id="view-agent" class="tabview" aria-label="诊断工作台">
+    <header class="page-head">
+      <div><h1>诊断工作台</h1><p class="page-head-note">描述故障，关联对象，核对证据后决定下一步。</p></div>
+    </header>
+    <section id="agentRestricted" class="surface" hidden>
+      <div class="section-head"><h2>诊断服务当前不可用</h2><span class="pill warn">受限</span></div>
+      <p class="notice warn">8010 保持问答配置；诊断需要在隔离测试服务中显式启用。不可用时这里只显示受限状态与恢复路径，不展示禁用表单。</p>
+      <div class="kv-grid">
+        <div><span>诊断服务</span><b id="agentAvailability" role="status">正在检查诊断服务…</b></div>
+        <div><span>隔离只读工作区</span><b><span id="isolatedState">正在核对隔离只读工作区状态…</span></b></div>
+      </div>
+      <div class="action-row">
+        <button type="button" class="ui-btn" id="agentToBusiness">查看启用说明</button>
+        <button type="button" class="ui-btn" id="agentToQa">去做运维问答</button>
+        <a id="isolatedEntry" class="ui-btn ghost" href="http://127.0.0.1:18021/" target="_blank" rel="noopener" hidden>打开隔离只读工作区</a>
+      </div>
+    </section>
+    <div id="agentWorkspace" hidden>
+      <p class="agent-mode-note" id="agentRuleNotice" hidden>规则诊断 · 读取关联对象的业务记录，给出待核查原因。请提供告警事件 ID 或设备 ID；不调用模型。</p>
+      <details id="agentEntry" class="agent-entry" open><summary>诊断条件</summary>
+      <form id="agentForm" class="agent-form">
+        <label class="agent-query-label ui-field" for="agentQuery"><span class="ui-label">问题</span><textarea class="ui-textarea" id="agentQuery" rows="2" maxlength="500" required placeholder="例如：AMF 注册成功率下降，先核查哪些原因？"></textarea></label>
+        <details class="agent-context" id="agentContext"><summary>关联告警或设备</summary><div class="agent-context-fields">
+        <label class="ui-field" for="agentAlarm"><span class="ui-label">告警事件 ID</span><input class="ui-input" id="agentAlarm" maxlength="64" pattern="[A-Za-z0-9_.:\-]+" placeholder="填写具体事件 ID，非告警码"></label>
+        <label class="ui-field" for="agentDevice"><span class="ui-label">设备 ID</span><input class="ui-input" id="agentDevice" maxlength="64" pattern="[A-Za-z0-9_.:\-]+" placeholder="device_id"></label>
+        <p class="agent-form-note ui-help">不填实体 ID 时查询知识；填写后读取授权快照。每次提交独立，不沿用问答历史或预览版本。</p>
+        </div></details>
+        <div class="agent-actions"><button id="agentSubmit" type="submit" class="ui-btn primary" disabled>开始诊断</button><button id="agentCancel" type="button" class="ui-btn" hidden>取消等待</button></div>
+      </form>
+      </details>
+      <div id="agentStages" class="agent-stages" role="list" aria-label="诊断阶段" hidden></div>
+      <p id="agentProgress" role="status" aria-live="polite"></p>
+      <div id="agentResult" hidden></div>
+      <section id="agentReview" class="agent-review" aria-live="polite" hidden></section>
+    </div>
+  </section>
+
+  <section id="view-gk" class="tabview" aria-label="知识治理">
+    <header class="page-head">
+      <div><h1>待审与缺口</h1><p class="page-head-note">问答、资料、版本、缺口四个视角合在一页：FAQ 回归状态、文档来源属性、版本状态，以及“登记缺口 → 补资料 → 发起回归 → 关闭”的闭环。缺口登记保存在本机，可导出。</p></div>
+      <div class="page-head-actions"><button id="gkRefresh" type="button" class="ui-btn">刷新</button></div>
+    </header>
+    <div id="gkBody"></div>
+  </section>
+
+  <section id="view-versions" class="tabview" aria-label="版本与发布">
+    <header class="page-head">
+      <div><h1>版本与发布</h1><p class="page-head-note">当前激活版本、候选与历史分开呈现；发布或回滚需要审核与门禁，一次只突出有效下一步。过期交接计划标记为历史，不能再执行。</p></div>
+      <div class="page-head-actions"><button id="versionRefresh" type="button" class="ui-btn">刷新</button></div>
+    </header>
+    <div id="versionSummary"></div>
+    <p id="versionStatus" role="status" aria-live="polite" class="meta-line"></p>
+    <div class="two-col">
+      <section class="surface"><div class="section-head"><h2>版本列表</h2><span class="meta-line" id="versionCount"></span></div><div id="versionList"></div></section>
+      <section class="surface"><div class="section-head"><h2>版本详情与发布步骤</h2></div><section id="versionDetail" aria-live="polite"></section></section>
+    </div>
+    <details class="tech-details"><summary>已提交发布与回滚账本（历史）</summary><div id="versionHistory"></div></details>
+  </section>
+  <section id="view-business" class="tabview" aria-label="业务与集成">
+    <header class="page-head">
+      <div><h1>集成状态</h1><p class="page-head-note">告警、设备、工单、变更与集成账本的只读记录工作区；数据只在隔离只读服务启用时可读，本页不伪造在线状态。</p></div>
+      <div class="page-head-actions"><button id="businessRefresh" type="button" class="ui-btn">刷新</button></div>
+    </header>
+    <p id="businessStatus" role="status" class="meta-line"></p>
+    <p id="businessScope" class="meta-line"></p>
+    <div id="businessAccess" class="business-access"></div>
+    <div id="businessControls" class="filter-bar" hidden>
+      <label class="ui-field"><span class="ui-label">记录类型</span><select id="businessKind" class="ui-select"><option value="alarms">告警</option><option value="devices">设备</option><option value="tickets">工单</option><option value="changes">变更</option><option value="integrations">集成状态</option></select></label>
+      <form id="businessFilter" class="filter-bar" style="margin:0;flex:1 1 320px">
+        <input id="businessQuery" class="ui-input grow" maxlength="100" placeholder="按ID或标题筛选">
+        <button type="submit" class="ui-btn primary">查询</button>
+      </form>
+    </div>
+    <div id="businessList" class="business-list"></div>
+    <div class="action-row"><button id="businessNext" type="button" class="ui-btn" hidden>加载下一页</button></div>
+    <section id="businessDetail" class="business-detail" aria-live="polite"></section>
+  </section>
+
+ <section id="view-kb" class="tabview">
+ <header class="page-head">
+  <div><h1>知识管理</h1><p class="page-head-note">浏览当前权限可见的 FAQ 与文档；查看原文会重新鉴权。版本下拉只列出当前服务真正可读的知识快照，模拟资料仅供本地演示。</p></div>
+ </header>
+ <form id="kbFilter" class="filter-bar">
+  <input id="kbSearch" class="ui-input grow" aria-label="知识关键词" maxlength="200" placeholder="搜索问题、来源或原文关键词">
+  <select id="kbKind" class="ui-select" aria-label="知识类型"><option value="all">全部类型</option><option value="faq">FAQ</option><option value="document">文档</option></select>
+  <select id="kbOrigin" class="ui-select" aria-label="资料属性"><option value="all">全部资料属性</option><option value="synthetic">模拟 / 自编标记</option><option value="non_synthetic">未标模拟</option></select>
+  <select id="kbVersion" class="ui-select" aria-label="知识版本"><option value="">当前激活版本</option></select>
+  <button type="submit" class="ui-btn primary">搜索 / 刷新</button>
+ </form>
+ <p id="kbVersionNotice" class="version-preview-notice" role="status" hidden></p>
+ <p id="kbSummary" class="meta-line" aria-live="polite"></p>
+ <div id="kbResults" class="knowledge-grid"></div>
+ <div class="knowledge-pagination"><button id="kbPrevious" type="button" class="ui-btn" disabled>上一页</button><span id="kbPage" class="meta-line"></span><button id="kbNext" type="button" class="ui-btn" disabled>下一页</button></div>
+ <div id="kbDetail" aria-live="polite"></div>
+ </section>
+
+ <section id="view-docs" class="tabview">
+  <header class="page-head">
+   <div><h1>上传与资料</h1><p id="uploadNotice" class="page-head-note" role="status">正在核对上传权限…</p></div>
+  </header>
+  <div class="sub-tabs docs-modes" role="tablist" aria-label="资料工作区">
+  <button class="sub-tab is-active" id="docsMode-upload" data-docs-pane="upload" type="button" role="tab" aria-selected="true">上传资料</button>
+  <button class="sub-tab" id="docsMode-jobs" data-docs-pane="jobs" type="button" role="tab" aria-selected="false">任务进度</button>
+  <button class="sub-tab" id="docsMode-documents" data-docs-pane="documents" type="button" role="tab" aria-selected="false">可读文档</button></div>
+  <ol class="flow-steps" id="docsSteps"><li><b>1</b>选择文件</li><li><b>2</b>核对资料</li><li><b>3</b>提交结果</li></ol>
+  <section class="surface" id="stepCandidate" hidden>
+    <div class="section-head"><h2>入库目标</h2><span class="pill muted" id="candidateState">尚未核对</span></div>
+    <p class="ui-help" id="candidateHint">请选择与当前工作区兼容的目标。没有可用目标时，可在下方创建；创建不代表资料获准。</p>
+    <details id="candidateCreateDetails" class="tech-details"><summary>创建新的入库目标</summary><form id="candidateForm" class="filter-bar" hidden><label class="ui-field grow"><span class="ui-label">新候选名称</span><input id="candidateLabel" class="ui-input" required maxlength="80" placeholder="例如：本地资料整理"></label><button id="candidateCreate" type="submit" class="ui-btn">创建入库目标</button></form></details>
+    <details class="tech-details"><summary>候选兼容状态与绑定说明</summary><div id="candidateCompatibility"></div></details>
+  </section>
+  <section class="surface" id="stepUpload">
+    <div class="section-head"><h2>上传资料</h2><span class="pill muted" id="uploadState">等待候选</span></div>
+    <p class="notice warn" id="uploadPrereq" hidden></p>
+    <form id="uploadForm" class="upload-form" hidden>
+      <label class="ui-field" style="grid-column:1/-1"><span class="ui-label">选择文档</span><span class="ui-file"><input id="fileInput" type="file" required accept=".md,.csv,.txt,.docx,.pdf,.xlsx"><strong id="fileLabel">点击选择文件</strong><span id="fileHint">支持 md/csv/txt/docx/pdf/xlsx，非空且 ≤20MB；英文文件名需有资料类型前缀</span></span></label>
+<details id="uploadFileRules" class="ui-help upload-file-rules"><summary>文件命名与格式要求</summary><p>使用英文文件名和资料分类前缀：手册 manual_、FAQ faq_、案例 fault_case_、流程 sop_、指南 guide_、标准 standard_。例如 manual_device.pdf。支持 md/csv/txt/docx/pdf/xlsx，非空且不超过20MB。</p></details>
+      <div id="uploadReviewFields" class="upload-review-fields" hidden><p class="ui-help" id="uploadReviewFilename"></p>      <label class="ui-field"><span class="ui-label">入库目标</span><select id="uploadVersion" class="ui-select" required><option value="">选择已有入库目标</option></select></label>
+      <label class="ui-field"><span class="ui-label">来源标识</span><input id="uploadSource" class="ui-input" required maxlength="128" placeholder="同一资料的修订沿用此标识"></label>
+      <p class="ui-help" style="grid-column:1/-1">请核对来源与目标；本次提交不会改变当前使用的知识版本。</p>
+      </div>
+      <div class="action-row" style="grid-column:1/-1"><button id="uploadWizardBack" type="button" class="ui-btn" hidden>上一步</button><button id="uploadWizardNext" type="button" class="ui-btn primary">核对资料</button><button id="uploadSubmit" type="submit" class="ui-btn primary" disabled hidden>提交资料</button></div>
+    </form>
+    <section id="uploadStepResult" hidden><h2>提交结果</h2><p class="ui-help">以服务器返回的审核和任务状态为准，暂存不会自动发布。</p><div class="action-row"><button class="ui-btn primary" id="uploadShowJobs" type="button">查看任务进度</button><button class="ui-btn" id="uploadAnother" type="button">继续添加资料</button></div></section>
+    <p id="uploadMsg" role="status" aria-live="polite" class="meta-line"></p>
+  </section>
+  <section class="surface" id="stepJobs" hidden>
+    <div class="section-head"><h2>处理进度与审核状态</h2><button id="jobRefresh" type="button" class="ui-btn sm">刷新任务</button></div>
+    <p id="ingestWorker" class="meta-line" role="status"></p>
+    <div id="ingestJobs" aria-live="polite"></div>
+    <div id="ingestLedger" aria-live="polite"></div>
+  </section>
+  <section class="surface" id="stepDocs" hidden>
+    <div class="section-head"><h2>当前可读文档</h2></div>
+    <form id="docFilter" class="filter-bar">
+      <input id="docSearch" class="ui-input grow" aria-label="知识关键词" maxlength="200" placeholder="搜索问题、来源或原文关键词">
+      <select id="docOrigin" class="ui-select" aria-label="资料属性"><option value="all">全部资料属性</option><option value="synthetic">模拟 / 自编标记</option><option value="non_synthetic">未标模拟</option></select>
+      <select id="docVersion" class="ui-select" aria-label="知识版本"><option value="">当前激活版本</option></select>
+      <button type="submit" class="ui-btn primary">搜索 / 刷新</button>
+    </form>
+    <p id="docVersionNotice" class="version-preview-notice" role="status" hidden></p>
+    <p id="docSummary" class="meta-line" aria-live="polite"></p>
+    <div id="docsList" class="knowledge-grid"></div>
+    <div class="knowledge-pagination"><button id="docPrevious" type="button" class="ui-btn" disabled>上一页</button><span id="docPage" class="meta-line"></span><button id="docNext" type="button" class="ui-btn" disabled>下一页</button></div>
+    <div id="docDetail" aria-live="polite"></div>
+  </section>
+ </section>
+
+  <section id="view-ops" class="tabview">
+    <header class="page-head"><div><h1>运行状态</h1><p class="page-head-note">当前服务、依赖与进程计数分组呈现；历史统计单独标注，组件可用不代表答案质量通过。</p></div><div class="page-head-actions"><button id="opsRefresh" type="button" class="ui-btn" hidden>刷新</button></div></header>
+    <p id="opsStatus" role="status" class="meta-line"></p><div id="opsAccess" class="governance-access" role="status" hidden></div>
+    <div id="opsBody" hidden>
+      <p id="opsSnapshot" class="meta-line"></p>
+      <div id="opsSummary"></div>
+      <div id="opsIssues"></div>
+      <div class="two-col">
+        <section class="surface"><div class="section-head"><h2>依赖与组件</h2></div><div id="opsHealth"></div></section>
+        <section class="surface"><div class="section-head"><h2>当前进程计数</h2></div><div id="opsCards"></div></section>
+      </div>
+      <details class="surface management-details"><summary>历史统计与趋势</summary><div id="opsRoute"></div><details class="tech-details"><summary>近 24 小时消息趋势</summary><div id="opsHourly"></div></details><div id="opsBad" class="mt-2"></div></details>
+    </div>
+  </section>
+
+  <section id="view-eval" class="tabview">
+    <header class="page-head"><div><h1>评测记录</h1><p class="page-head-note">按版本索引报告，先看来源、范围、分母、时间与结果；独立质量缺口单独列出，历史任务可筛选。</p></div><div class="page-head-actions"><button id="evalRefresh" type="button" class="ui-btn" hidden>刷新</button></div></header>
+    <p id="evalStatus" role="status" class="meta-line"></p><div id="evalAccess" class="governance-access" role="status" hidden></div>
+    <div id="evalBody" hidden>
+      <p id="evalSnapshot" class="meta-line"></p>
+      <div id="evalSummary"></div>
+      <section class="surface"><div class="section-head"><h2>按版本查看报告</h2></div><div id="evalIndex"></div><div id="evalGaps"></div></section>
+      <details class="surface management-details"><summary>检查项与结构门禁</summary><div id="evalSla"></div><div class="cards" id="evalCards"></div><div id="evalGate"></div></details>
+      <details class="tech-details"><summary>受控开发评测与历史任务</summary><div id="evalWorkflow"></div><div id="evalCats"></div><div id="evalCases"></div></details>
+    </div>
+  </section>
+
+  <section id="view-lab" class="tabview" aria-label="场景实验室">
+    <header class="page-head">
+      <div><h1>场景实验室</h1><p class="page-head-note">四个可演练场景：授权撤回、缓存失效、入库任务重试、版本回滚。前两个在本页真实执行并逐步展示结果；后两个引导到受控页面。所有动作都走真实接口、写审计，不产生模拟数据。</p></div>
+      <div class="page-head-actions"><button id="labRefresh" type="button" class="ui-btn">重新演练</button></div>
+    </header>
+    <div id="labBody"></div>
+  </section>
+
+  <section id="view-perm" class="tabview">
+
+    <header class="page-head"><div><h1>访问管理</h1><p class="page-head-note">凭据列表与签发/吊销优先；角色说明与接口矩阵折叠在下方，权限由后端逐次鉴权。</p></div><div class="page-head-actions"><button id="permRefresh" type="button" class="ui-btn" hidden>刷新</button></div></header>
+    <p id="permStatus" role="status" class="meta-line"></p><div id="permAccess" class="governance-access" role="status" hidden></div>
+    <div id="permBody" hidden>
+      <p id="permSnapshot" class="meta-line"></p>
+      <section class="surface"><div class="section-head"><h2>已签发凭据</h2><span class="meta-line" id="permCount"></span><button id="permNewKey" class="ui-btn primary" type="button" hidden>签发新凭据</button></div><div id="permKeys"></div></section>
+      <section id="keyIssuePanel" class="surface" hidden>
+        <div class="section-head"><h2>签发同租户 API Key</h2><span class="pill info">管理员</span></div>
+        <div class="filter-bar">
+          <label class="ui-field grow"><span class="ui-label">凭据明文（≥8 位）</span><input id="nkKey" class="ui-input" type="password" autocomplete="off" maxlength="64" placeholder="例如：tk-xxxx"></label>
+          <label class="ui-field"><span class="ui-label">用户 ID</span><input id="nkUser" class="ui-input" placeholder="例如：ops02"></label>
+          <label class="ui-field"><span class="ui-label">角色</span><select id="nkRoles" class="ui-select"><option value="ops">ops · 运维</option><option value="guest">guest · 只读</option><option value="auditor">auditor · 审计</option><option value="admin">admin · 管理员</option></select></label>
+          <button id="nkCreate" class="ui-btn primary" type="button">签发</button>
+        </div>
+        <p class="ui-help" id="nkMsg">请自行保存要提交的凭据；成功后页面清除明文。</p>
+      </section>
+      <details class="tech-details"><summary>角色说明与接口权限矩阵</summary><div id="permMatrix"></div></details>
+    </div>
+  </section>
+</main>
+
+<dialog id="keyDlg">
+  <h3>设置 API Key</h3>
+  <p class="context-note">使用已签发的凭据访问知识和业务上下文。</p>
+  <input id="keyInput" type="password" autocomplete="off" aria-label="API Key" placeholder="输入 API Key">
+  <div class="acts">
+    <button onclick="document.getElementById('keyDlg').close()">取消</button>
+    <button class="primary" id="keySave">保存</button>
+  </div>
+</dialog>
+
+<script src="/static/time-format.js"></script>
+<script src="/static/local-entry-auth.js"></script>
+<script src="/static/evidence-viewer.js"></script>
+<script src="/static/sse-client.js"></script>
+<script src="/static/answer-renderer.js"></script>
+<script src="/static/workspace.js"></script>
+<script src="/static/knowledge-workspace.js"></script>
+<script src="/static/motion.js"></script>
+<script src="/static/version-workspace.js"></script>
+<script src="/static/dashboard-workspace.js"></script>
+<script src="/static/alerts-workspace.js"></script>
+<script src="/static/devices-workspace.js"></script>
+<script src="/static/governance-workspace.js"></script>
+<script src="/static/agent-workspace.js"></script>
+<script src="/static/governance-kb-workspace.js"></script>
+<script src="/static/query-workspace.js"></script>
+<script src="/static/lab-workspace.js"></script>
+<script src="/static/business-workspace.js"></script>
+<script src="/static/tickets-workspace.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const chat = $("chat");
+let sessionId = localStorage.getItem("session_id") ||
+  (() => { const s = crypto.randomUUID(); localStorage.setItem("session_id", s); return s; })();
+const apiKey = () => localStorage.getItem("api_key") || "";
+let transportMode = localStorage.getItem("chat_transport") === "ws" ? "ws" : "sse";
+let activeSse = null;
+let lastSseFailed = false;
+$("transportMode").value = transportMode;
+const authHeaders = () => apiKey()
+  ? { "X-API-Key": apiKey() }
+  : { "X-User-Id": "web-ui", "X-User-Roles": "ops", "X-Tenant-Id": "default" };
+Workspace.init({ headers: authHeaders, key: apiKey, session: () => sessionId });
+AgentWorkspace.init({ headers: authHeaders, key: apiKey });
+// 隔离只读工作区入口：仅在服务可用时显示直达链接，避免死链
+(async () => {
+  const link = $("isolatedEntry"), state = $("isolatedState");
+  try {
+    const response = await fetch("/business/availability", { headers: authHeaders(), cache: "no-store" });
+    const data = response.ok ? await response.json() : null;
+    if (data && data.isolated && data.isolated.status === "running") { link.hidden = false; state.textContent = ""; }
+    else state.textContent = "未启动（启用方法见“业务与集成”页）";
+  } catch (error) { state.textContent = "隔离只读工作区状态未知（可在“业务与集成”页核对）"; }
+})();
+
+/* ---------- 历史会话（本地存储 + 回放） ---------- */
+function sessKey(id) { return "chat_" + id; }
+function loadMessages(id) {
+  try { return JSON.parse(localStorage.getItem(sessKey(id)) || "[]"); } catch { return []; }
+}
+function saveMessage(id, msg) {
+  const arr = loadMessages(id);
+  arr.push(msg);
+  localStorage.setItem(sessKey(id), JSON.stringify(arr.slice(-60)));
+  renderSessionList();
+}
+/* ---------- 历史会话管理（置顶 / 删除 / 批量） ---------- */
+function sessionPins() { try { return JSON.parse(localStorage.getItem("session_pins") || "[]"); } catch { return []; } }
+function savePins(a) { localStorage.setItem("session_pins", JSON.stringify(a.slice(0, 20))); }
+let sessBatch = false;
+const batchSel = new Set();
+
+function renderSessionList() {
+  const idx = JSON.parse(localStorage.getItem("session_index") || "[]");
+  const pins = sessionPins();
+  const base = [...idx].reverse();  // 最新在前
+  // 置顶的排最前（稳定排序保持组内时间序）
+  const sorted = base.sort((a, b) => (pins.includes(b.id) ? 1 : 0) - (pins.includes(a.id) ? 1 : 0));
+  const list = $("sessList"); list.innerHTML = "";
+  sorted.slice(0, 50).forEach(s => {
+    const pinned = pins.includes(s.id);
+    const d = el("div", "sess" + (s.id === sessionId ? " active" : ""));
+    d.title = s.title;
+    if (sessBatch) {
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.checked = batchSel.has(s.id);
+      cb.onclick = e => e.stopPropagation();
+      cb.onchange = () => { cb.checked ? batchSel.add(s.id) : batchSel.delete(s.id); updateSessTools(); };
+      d.appendChild(cb);
+      d.appendChild(el("span", "t", s.title));
+      d.onclick = () => { batchSel.has(s.id) ? batchSel.delete(s.id) : batchSel.add(s.id);
+                          updateSessTools(); renderSessionList(); };
+    } else {
+      d.onclick = () => switchSession(s.id);
+      d.appendChild(el("span", "t", (pinned ? "📌 " : "") + s.title));
+      const ops = el("span", "ops");
+      const pin = el("button", null, "📌");
+      pin.title = pinned ? "取消置顶" : "置顶";
+      pin.onclick = e => { e.stopPropagation(); togglePin(s.id); };
+      const del = el("button", null, "🗑");
+      del.title = "删除会话";
+      del.onclick = e => {
+        e.stopPropagation();
+        if (!confirm(`删除会话「${s.title}」？消息记录将一并清除，不可恢复。`)) return;
+        delSessions([s.id]);
+      };
+      ops.append(pin, del);
+      d.appendChild(ops);
+    }
+    list.appendChild(d);
+  });
+}
+
+function togglePin(id) {
+  const pins = sessionPins();
+  const i = pins.indexOf(id);
+  if (i >= 0) pins.splice(i, 1); else pins.unshift(id);
+  savePins(pins);
+  renderSessionList();
+}
+
+function delSessions(ids) {
+  const idx = JSON.parse(localStorage.getItem("session_index") || "[]")
+    .filter(s => !ids.includes(s.id));
+  localStorage.setItem("session_index", JSON.stringify(idx));
+  ids.forEach(id => localStorage.removeItem(sessKey(id)));
+  savePins(sessionPins().filter(p => !ids.includes(p)));
+  if (ids.includes(sessionId)) {
+    cancelActiveSse();
+    const next = idx[idx.length - 1];  // 切到剩余最近的会话
+    if (next) { sessionId = next.id; localStorage.setItem("session_id", sessionId);
+                renderSessionMessages(sessionId); }
+    else { $("newBtn").click(); return; }
+  }
+  batchSel.clear(); sessBatch = false; updateSessTools();
+  renderSessionList();
+}
+
+function updateSessTools() {
+  $("sessTools").style.display = sessBatch ? "flex" : "none";
+  $("sessMgr").textContent = sessBatch ? "完成" : "管理";
+  $("sessSelCount").textContent = `已选 ${batchSel.size}`;
+}
+$("sessMgr").onclick = () => {
+  sessBatch = !sessBatch; batchSel.clear();
+  updateSessTools(); renderSessionList();
+};
+$("sessAll").onclick = () => {
+  const all = JSON.parse(localStorage.getItem("session_index") || "[]").map(s => s.id);
+  if (batchSel.size >= all.length) batchSel.clear(); else all.forEach(id => batchSel.add(id));
+  updateSessTools(); renderSessionList();
+};
+$("sessDel").onclick = () => {
+  if (!batchSel.size) { alert("请先勾选要删除的会话"); return; }
+  if (!confirm(`确认删除所选 ${batchSel.size} 个会话？消息记录将一并清除，不可恢复。`)) return;
+  delSessions([...batchSel]);
+};
+function registerSession(id, title) {
+  const idx = JSON.parse(localStorage.getItem("session_index") || "[]");
+  if (!idx.find(s => s.id === id)) { idx.push({ id, title: title.slice(0, 24) });
+    localStorage.setItem("session_index", JSON.stringify(idx.slice(-50))); }
+  renderSessionList();
+}
+function questionDraftKey(id = sessionId) {
+  let fingerprint=0;for(const c of apiKey())fingerprint=(fingerprint*31+c.charCodeAt(0))>>>0;
+  return 'qa.draft.v1:'+fingerprint.toString(16)+':'+id;
+}
+function saveQuestionDraft() {try { sessionStorage.setItem(questionDraftKey(), $('q').value); } catch {} }
+function restoreQuestionDraft() {try { $('q').value=sessionStorage.getItem(questionDraftKey())||''; } catch { $('q').value=''; } $('q').dispatchEvent(new Event('input'));}
+function switchSession(id) {
+  if (id === sessionId) return;
+  saveQuestionDraft();
+  cancelActiveSse();
+  localStorage.setItem("session_id", id);
+  sessionId = id;
+  restoreQuestionDraft();
+  renderSessionMessages(id);
+  renderSessionList();
+}
+$("newBtn").onclick = () => {
+  saveQuestionDraft();
+  cancelActiveSse();
+  const id = crypto.randomUUID();
+  localStorage.setItem("session_id", id);
+  sessionId = id;
+  restoreQuestionDraft();
+  localStorage.removeItem(sessKey(id));
+  renderSessionMessages(id);
+  renderSessionList();
+};
+function renderSessionMessages(id) {
+  pending = null; $("send").disabled = false;
+  Workspace.reset();
+  chat.innerHTML = "";
+  const msgs = loadMessages(id);
+  document.getElementById("view-qa")?.classList.toggle("has-dialog", msgs.length > 0);
+  if (!msgs.length) {
+    chat.appendChild(Workspace.welcome());
+    return;
+  }
+  msgs.forEach(m => {
+    if (m.role === "user") addUser(m.text, true);
+    else {
+      const n = newAssistant();
+      n.root.dataset.answerMode = m.answerMode || "";
+      renderAnswer(n.body, m.text);
+      addMeta(n.root, m.decision, m.sources, m.messageId, m.degraded, m.relatedAlarms, m.kb, m.status);
+    }
+  });
+}
+registerSession(sessionId, loadMessages(sessionId)[0]?.text || "新会话");
+
+/* ---------- 消息渲染 ---------- */
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function escapeHtml(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function renderAnswer(container, fullText) {
+  AnswerRenderer.render(container, fullText);
+}
+
+function addUser(text, replay) {
+  const m = el("div", "msg user", text);
+  chat.appendChild(m);
+  if (!replay) saveMessage(sessionId, { role: "user", text });
+  scroll();
+}
+function newAssistant() {
+  const m = el("div", "msg assistant");
+  m.appendChild(el("div", "role-tag", "◇ 智维助手"));
+  const body = el("div"); m.appendChild(body);
+  const typing = el("div", "typing", "");
+  typing.appendChild(el("span", "stagehint", "正在理解问题…"));
+  body.appendChild(typing);
+  chat.appendChild(m); scroll();
+  return { root: m, body };
+}
+function addMeta(node, decision, sources, messageId, degraded, relatedAlarms, kbVersion, answerStatus) {
+  const kb = kbVersion || ($("dKb") && $("dKb").textContent !== "—" ? $("dKb").textContent : "未提供");
+  if (["REFUSED", "OUT_OF_SCOPE", "NO_EVIDENCE", "NEEDS_CLARIFICATION", "FAILED"].includes(answerStatus)) sources = [];
+  const meta = el("div", "meta");
+  const selectAnswer = el("button", "subtle-button answer-select", "查看依据");
+  selectAnswer.type = "button"; selectAnswer.setAttribute("aria-pressed", "false");
+  selectAnswer.hidden = !sources?.length;
+  selectAnswer.onclick = () => { node._selectAnswer?.(); Workspace.showPanel('evidencePanel'); }; meta.appendChild(selectAnswer);
+  if (decision) {
+    const routeDetail = el("details", "answer-route");
+    routeDetail.append(el("summary", null, "回答详情"), el("span", "badge", `🧭 ${decision.route}`));
+    meta.appendChild(routeDetail);
+    meta.appendChild(el("span", "badge dim", `意图 ${decision.intent} · ${decision.source} ${decision.score}`));
+  }
+  const mode = node.dataset.answerMode;
+
+  if (answerStatus === "NO_EVIDENCE") node.appendChild(el("p", "answer-guidance", "当前知识库未找到对应资料。可以补充设备、版本或故障现象后再提问。"));
+  if (degraded) meta.appendChild(el("span", "badge warn", "⚠ 降级（引用模式）"));
+  if (answerStatus) {
+    const labels = { ANSWERED: decision?.route === "faq_exact" ? "FAQ直答" : mode === "generation" ? "生成回答" : mode === "citation" || degraded ? "原文摘录" : "已回答", DEGRADED: "引用模式", NEEDS_CLARIFICATION: "待补充条件", OUT_OF_SCOPE: "已拒答", REFUSED: "已拒答", NO_EVIDENCE: "暂无证据", FAILED: "请求失败" };
+    const badge = el("span", "badge" + (answerStatus === "ANSWERED" ? "" : " warn"), labels[answerStatus] || answerStatus);
+    badge.dataset.status = answerStatus; meta.appendChild(badge);
+  }
+  if (sources && sources.length) {
+    const det = el("details", "src");
+    det.appendChild(el("summary", null, `查看来源 · ${sources.length} 条`));
+    const ul = el("ul");
+    sources.forEach((s, i) => {
+      const li = el("li", null,
+        `[${i + 1}] ${s.source || s.doc_id}${s.doc_type ? " · " + s.doc_type : ""}` +
+        (s.clause ? " · 条款 " + s.clause : "") + ` · ${s.score} `);
+      const jump = el("button", null, "查看原文");
+      jump.title = "重新校验权限后查看对应版本的原文片段";
+      jump.style.cssText = "border:0;background:none;color:var(--brand);cursor:pointer;font-size:11px;padding:0 4px 0 0";
+      jump.onclick = () => node._openEvidence?.(i);
+      li.appendChild(jump);
+      // 引用 chunk 原文容器（展开 details 时统一加载）
+      const box = el("div", "chunkview", "");
+      box.style.display = "none";
+      li.appendChild(box);
+      li._src = s; li._box = box;
+      ul.appendChild(li);
+    });
+    // 来源列表只展示元信息；读取原文统一交给按次鉴权的证据抽屉。
+    det.addEventListener("toggle", () => {
+      if (!det.open) [...ul.children].forEach(li => { li._box._request = (li._box._request || 0) + 1; li._box.textContent = ""; });
+    });
+    node._openEvidence = index => { node._selectAnswer?.(); if (sources[index]) Workspace.openSource(sources[index]); };
+    det.appendChild(ul); (meta.querySelector(".answer-route") || meta).appendChild(det);
+  }
+  if (relatedAlarms && relatedAlarms.length) {
+    const rel = el("details", "src");
+    rel.appendChild(el("summary", null, `🔗 相关告警推荐 ${relatedAlarms.length} 条`));
+    const ul2 = el("ul");
+    relatedAlarms.forEach(r => ul2.appendChild(el("li", null,
+      `${r.alarm_code} · ${r.source} · ${r.summary.slice(0, 40)}`)));
+    rel.appendChild(ul2); meta.appendChild(rel);
+  }
+  if (messageId) {
+    const fb = el("div", "fb");
+    const up = el("button", null, "有帮助");
+    const down = el("button", null, "需要改进");
+    const reasons = el("div", "reasons");
+    const feedbackStatus = el("span", "muted"); feedbackStatus.setAttribute("aria-live", "polite");
+    ["答案错误", "内容不完整", "引用无关", "其他"].forEach(rc => {
+      const b = el("button", null, rc);
+      b.onclick = () => send("down", rc);
+      reasons.appendChild(b);
+    });
+    const regen = el("button", null, "重新提问");
+    let previous = node.previousElementSibling;
+    while (previous && !previous.classList.contains("user")) previous = previous.previousElementSibling;
+    const originalQuery = previous?.textContent || "";
+    regen.onclick = () => { if (originalQuery) ask(originalQuery); };
+    const copy = el("button", null, "复制");
+    const send = async (rating, reason = "") => {
+      if (fb.dataset.done || fb.dataset.sending) return;
+      const feedbackKey = apiKey(), feedbackSession = sessionId;
+      const feedbackCurrent = () => node.isConnected && apiKey() === feedbackKey && sessionId === feedbackSession;
+      fb.dataset.sending = "1"; feedbackStatus.textContent = "正在提交…";
+      try {
+        await sendFeedback(messageId, rating, reason);
+        if (!feedbackCurrent()) { feedbackStatus.textContent = ""; return; }
+        fb.dataset.done = "1"; up.classList.toggle("on", rating === "up"); down.classList.toggle("on", rating === "down");
+        reasons.classList.remove("show"); feedbackStatus.textContent = "反馈已记录";
+      } catch (error) { feedbackStatus.textContent = feedbackCurrent() ? error.message : ""; }
+      finally { delete fb.dataset.sending; }
+    };
+    up.onclick = () => send("up");
+    down.onclick = () => { if (!fb.dataset.done) reasons.classList.toggle("show"); };
+    copy.onclick = async () => {
+      const text = node.querySelector(".answer")?.innerText || "";
+      try { await navigator.clipboard.writeText(text); copy.textContent = "✓ 已复制"; }
+      catch { copy.textContent = "复制失败，请手动选择正文"; }
+      setTimeout(() => copy.textContent = "复制", 1500);
+    };
+    fb.append(up, down, regen, copy, feedbackStatus);
+    meta.appendChild(fb);
+    meta.appendChild(reasons);
+  }
+  // 答案正文里的 [n] 引用标记可点击 → 跳转来源文档
+  node.querySelectorAll(".answer .ref").forEach(sp => {
+    const n = parseInt((sp.textContent || "").replace(/\D/g, ""), 10);
+    const s = sources && sources[n - 1];
+    if (!s) return;
+    sp.style.cursor = "pointer";
+    sp.title = `查看引用原文：${s.source || s.doc_id}`;
+    sp.onclick = () => node._openEvidence?.(n - 1);
+    sp.tabIndex = 0; sp.setAttribute("role", "button");
+    sp.setAttribute("aria-label", `查看引用 ${n} 原文：${s.source || s.doc_id}`);
+    sp.onkeydown = event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); sp.click(); } };
+  });
+  node.appendChild(meta);
+  Workspace.bindAnswer(node, sources, kb, answerStatus);
+  scroll();
+}
+
+/* 跳转到文档管理板块并展开指定文档的分块 */
+async function jumpToDoc(source, kbVersion) {
+  if (!source) return;
+  switchTab("docs");
+  await loadDocs();
+  const rows = [...document.querySelectorAll("#docsList tr.clickable")];
+  let row = rows.find(tr => tr.cells[1] && tr.cells[1].textContent.trim() === source);
+  // 工单类引用 source 是工单号（TT-xxx）→ 定位到该版本的工单文件
+  if (!row && /^TT-/i.test(source)) {
+    row = rows.filter(tr => /^fault_case/i.test(tr.cells[1]?.textContent || ""))
+              .sort((a, b) => b.cells[1].textContent.localeCompare(a.cells[1].textContent))[0];
+  }
+  if (!row) { console.warn("未找到文档行:", source); return; }
+  row.scrollIntoView({ behavior: "smooth", block: "center" });
+  row.style.outline = "2px solid var(--brand)";
+  setTimeout(() => { row.style.outline = ""; }, 1600);
+  if (!(row.nextElementSibling && row.nextElementSibling.classList.contains("chunk-detail"))) row.click();
+}
+/* ---- 链路时间线实时状态（stage 事件驱动） ---- */
+const PIPE_STEPS = [
+  { key: "intent", name: "意图判定" },
+  { key: "retrieve", name: "检索+精排" },
+  { key: "generate", name: "LLM 生成" },
+  { key: "verify", name: "引用核验" },
+];
+let stageState = {};
+function renderPipelineLive() {
+  $("pipeDiag").innerHTML = PIPE_STEPS.map(s => {
+    const st = stageState[s.key];
+    if (!st) return `<div class="pstep">${s.name}</div>`;
+    if (st.status === "done")
+      return `<div class="pstep done"><span>${s.name}</span><span>${st.ms != null ? st.ms + " ms" : ""}</span></div>`;
+    if (st.status === "running")
+      return `<div class="pstep running"><span>${st.label || s.name}…</span></div>`;
+    if (st.status === "warn")
+      return `<div class="pstep warn"><span>${s.name}</span><span>未通过</span></div>`;
+    return `<div class="pstep">${s.name}</div>`;
+  }).join("");
+}
+function setStage(step, status, ms, label) {
+  stageState[step] = { status, ms, label };
+  renderPipelineLive();
+  const hint = pending?.body?.querySelector(".stagehint");
+  if (hint) {
+    const r = PIPE_STEPS.find(s => stageState[s.key]?.status === "running");
+    hint.textContent = r ? `${stageState[r.key].label || r.name}…` : "正在处理…";
+  }
+}
+
+function updateDiag(data, decision, sources) {
+  $("dKb").textContent = data.kb_version || "—";
+  $("dSess").textContent = sessionId.slice(0, 8) + "…";
+  const rows = [];
+  if (decision) {
+    rows.push(["命中路径", data.route || decision.route], ["意图", decision.intent],
+              ["判定来源", `${decision.source} ${decision.score}`]);
+  }
+  rows.push(["最终状态", data.status || "—"], ["来源数量", sources ? sources.length : 0],
+            ["总耗时", data.timings_ms != null ? data.timings_ms + " ms" : "未测"]);
+  if (data.degraded) rows.push(["状态", "降级（引用模式）"]);
+  const semHit = data.retrieval?.semantic_cache_hit;
+  if (semHit) rows.push(["语义缓存命中", `相似度 ${semHit}`]);
+  $("answerDiag").replaceChildren(...rows.map(([k, v]) => {
+    const row = el("div", "drow"), value = el("strong", null, v); value.title = String(v);
+    row.append(el("span", null, k), value); return row;
+  }));
+
+  // 链路终态：以实时 stage 状态为准，缺省耗时用 end 数据补齐
+  const ret = data.retrieval || {};
+  const finalSteps = PIPE_STEPS.map(s => {
+    const st = stageState[s.key] || {};
+    let status = st.status || "skip";
+    let ms = st.ms;
+    if (s.key === "intent" && ms == null) ms = data.intent_ms;
+    if (s.key === "retrieve" && ms == null) ms = ret.retrieval_rerank_ms;
+    if (s.key === "generate" && ms == null) ms = ret.generation_ms;
+    if (status === "running") status = "done";
+    return { name: s.name, status, ms };
+  });
+  $("pipeDiag").innerHTML = finalSteps.map(s => {
+    if (s.status === "skip") return `<div class="pstep skip">${s.name}（跳过）</div>`;
+    if (s.status === "warn") return `<div class="pstep warn"><span>${s.name}</span><span>未通过→引用降级</span></div>`;
+    return `<div class="pstep done"><span>${s.name}</span><span>${s.ms != null ? s.ms + " ms" : ""}</span></div>`;
+  }).join("");
+
+  const total = data.timings_ms || 0;
+  const segs = [["意图", data.intent_ms ?? stageState.intent?.ms ?? 0],
+                ["检索+精排", ret.retrieval_rerank_ms ?? stageState.retrieve?.ms],
+                ["生成", ret.generation_ms ?? stageState.generate?.ms]];
+  const known = segs.reduce((a, s) => a + (s[1] || 0), 0);
+  const colors = ["#2563eb", "#16a34a", "#d97706"];
+  const barHtml = total > 0
+    ? segs.filter(s => s[1]).map(([name, ms], i) => {
+        const pct = Math.round(ms / total * 100);
+        return `<div class="lbl">${name} ${ms} ms（${pct}%）</div>` +
+               `<div class="bar"><i style="width:${pct}%;background:${colors[i]}"></i></div>`;
+      }).join("") +
+      (total - known > 50 ? `<div class="lbl">其他 ${total - known} ms</div>` : "")
+    : '<div class="drow"><span>—</span><strong>—</strong></div>';
+  $("perfDiag").innerHTML = barHtml;
+}
+async function sendFeedback(messageId, rating, reason) {
+  if (!messageId) return;
+  const r = await fetch("/feedback", { method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify({ message_id: messageId, rating, reason: reason || null }) });
+  if (!r.ok) throw new Error(({401: "请先设置有效的 API Key。",403: "无权反馈此回答。",404: "回答记录不可用。",429: "提交过于频繁，请稍后重试。"})[r.status] || "反馈未提交，请稍后重试。");
+}
+function scroll() { chat.scrollTop = chat.scrollHeight; }
+
+/* ---------- 健康与知识库版本 ---------- */
+let wsAlive = false;  // WS 实时状态（health 轮询不得覆盖它）
+let versionRequest = 0;
+let recommendationRequest = 0;
+async function refreshRecommendations() {
+  const request = ++recommendationRequest, key = apiKey(), version = $("qaVersion").value;
+  // 推荐问题渲染在问答空态（welcome 的 prompt-grid）内；侧栏容器已移除。
+  Workspace.setRecommendations([], null, "正在加载当前可读问题…");
+  try {
+    const response = await fetch('/qa/recommendations' + (version ? '?kb_version=' + encodeURIComponent(version) : ''), {headers: authHeaders()});
+    if (!response.ok) throw new Error('unavailable');
+    const data = await response.json();
+    if (request !== recommendationRequest || key !== apiKey() || version !== $("qaVersion").value) return;
+    Workspace.setRecommendations(data.items || [], data.kb_version);
+  } catch {
+    if (request === recommendationRequest && key === apiKey() && version === $("qaVersion").value) {
+      Workspace.setRecommendations([], null, "推荐暂不可用，请检查登录或服务。");
+    }
+  }
+}
+$("qaVersion").addEventListener("change", refreshRecommendations);
+function health() {
+  const request = ++versionRequest, startedKey = apiKey();
+  fetch("/health").then(r => r.json()).then(d => {
+    if (request !== versionRequest || startedKey !== apiKey()) return;
+    AgentWorkspace.capability(d.agent_enabled === true);
+    const env = d.environment || "dev";
+    const mode = d.generation_enabled === false ? " · 引用模式" : "";
+    PIPE_STEPS.find(s => s.key === "generate").name = mode ? "引用输出" : "LLM 生成";
+    $("envBadge").textContent = env.toUpperCase() + mode;
+    $("envBadge").dataset.env = env;
+    $("contextEnv").textContent = env.toUpperCase() + mode;
+    const ok = d.status === "ok";
+    $("dot").className = "dot " + (ok && (transportMode === "sse" || wsAlive) ? "ok" : "bad");
+    if (transportMode === "ws" && !wsAlive) $("status").textContent = "兼容通道重连中…";
+    else if (transportMode === "sse" && ok && !activeSse && !lastSseFailed) $("status").textContent = "服务就绪";
+    else if (!ok) $("status").textContent =
+      "服务降级：" + Object.entries(d.components).filter(([, v]) => !v.startsWith("ok")).map(([k]) => k).join("/");
+    else if ($("status").textContent.includes("降级") || $("status").textContent.includes("无法"))
+      $("status").textContent = "服务正常";
+  }).catch(() => { if (request !== versionRequest || startedKey !== apiKey()) return; AgentWorkspace.capability(false); $("dot").className = "bad"; $("status").textContent = "无法连接服务"; });
+  fetch("/kb/versions", { headers: authHeaders() }).then(r => {
+    if (!r.ok) throw new Error("版本列表不可用");
+    return r.json();
+  }).then(d => {
+    if (request !== versionRequest || startedKey !== apiKey()) return;
+    const act = (d.versions || []).find(v => v.status === "ACTIVE");
+    $("kbVer").textContent = act ? act.version + "（激活）" : "无激活版本";
+    const selector = $("qaVersion"), selected = selector.value;
+    selector.replaceChildren(new Option("当前激活版本", ""));
+    for (const version of (d.can_preview_staged ? d.versions || [] : []).filter(v => v.status === "STAGED"))
+      selector.add(new Option(`${version.version}（管理员预览）`, version.version));
+    if ([...selector.options].some(option => option.value === selected)) selector.value = selected;
+    refreshRecommendations();
+    const preview = Boolean(selector.value);
+    $("versionNote").dataset.preview = String(preview);
+    $("versionNote").textContent = preview ? "管理员预览 · 不改变激活版本" : "当前激活：" + (act?.version || "无");
+  }).catch(() => { if (request !== versionRequest || startedKey !== apiKey()) return; $("qaVersion").replaceChildren(new Option("当前激活版本", "")); $("kbVer").textContent = "版本列表不可用"; $("versionNote").textContent = "请检查凭据后刷新版本列表"; refreshRecommendations(); });
+}
+health(); setInterval(health, 30000);
+
+/* ---------- SSE 默认，WebSocket 显式兼容 ---------- */
+let ws = null, pending = null, pendingUserText = "", reconnectDelay = 2000, wsReconnectTimer = null;
+const outbox = [];  // 断线排队：重连后自动补发
+function cancelActiveSse() {
+  if (transportMode === "ws" && ws) {
+    const oldSocket = ws; ws = null; wsAlive = false;
+    oldSocket.close();
+    if (pending) { pending.body.textContent = "已取消显示；请求可能仍在服务端处理。"; pending = null; }
+    if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+    wsReconnectTimer = setTimeout(() => {
+      if (transportMode === "ws" && $("view-qa").classList.contains("active")) connect();
+    }, 100);
+  }
+  if (activeSse) {
+    activeSse.controller.abort();
+    lastSseFailed = true;
+    $("status").textContent = "已停止流式接收，请核对后手动重试";
+    if (pending) {
+      pending.body.textContent = "已取消显示；请求可能仍在服务端处理，请核对后手动重试。";
+      pending.root.classList.add("err");
+      pending = null;
+    }
+  }
+  activeSse = null;
+  $("send").disabled = false;
+}
+$("qaVersion").addEventListener("change", cancelActiveSse);
+window.addEventListener("storage", event => { if (event.key === "api_key") cancelActiveSse(); });
+function handleChatEvent(event, data) {
+  if (event === "start") {
+    Workspace.setSources([], data.kb_version, "PENDING");
+    stageState = {};
+    renderPipelineLive();
+    pending = newAssistant();
+  } else if (event === "stage") {
+    setStage(data.step, data.status, data.ms, data.label);
+  } else if (event === "decision") {
+    if (pending) {
+      pending._decision = data; pending.body.innerHTML = "";
+      const typing = el("div", "typing", "");
+      typing.appendChild(el("span", "stagehint", "正在检索与精排（复杂问句可能需十余秒，请稍候）…"));
+      pending.body.appendChild(typing);
+    }
+  } else if (event === "delta") {
+    if (!pending) pending = newAssistant();
+    const t = pending.body.querySelector(".typing"); if (t) t.remove();
+    pending._text = (pending._text || "") + data.text;
+    renderAnswer(pending.body, pending._text); scroll();
+  } else if (event === "sources") {
+    if (pending) { pending._sources = data.sources; pending._related = data.related_alarms; }
+  } else if (event === "end") {
+    if (pending) {
+      const t = pending.body.querySelector(".typing"); if (t) t.remove();
+      // Tokens are provisional until verification; never persist their draft over done.answer.
+      const text = data.answer ?? pending._text ?? "";
+      const finalSources = ["REFUSED", "OUT_OF_SCOPE", "NO_EVIDENCE", "NEEDS_CLARIFICATION", "FAILED"].includes(data.status)
+        ? [] : data.sources ?? pending._sources ?? [];
+      if (data.route) pending._decision = { ...pending._decision, route: data.route };
+      renderAnswer(pending.body, text);
+      pending.root.dataset.answerMode = data.answer_mode || data.diagnostics?.answer_mode || (data.degraded ? "citation" : "");
+      addMeta(pending.root, pending._decision, finalSources, data.message_id, data.degraded,
+              pending._related, data.kb_version, data.status);
+      updateDiag(data, pending._decision, finalSources);
+      saveMessage(sessionId, { role: "assistant", text, decision: pending._decision,
+                               sources: finalSources, messageId: data.message_id,
+                               degraded: data.degraded, relatedAlarms: pending._related,
+                               kb: data.kb_version, status: data.status, answerMode: pending.root.dataset.answerMode });
+    }
+    pending = null;
+    if (transportMode === "ws") $("send").disabled = false;
+    chat.querySelectorAll('[data-outbox="1"]').forEach(x => x.remove());
+    if (transportMode === "ws" && outbox.length) flushOutbox();
+  } else if (event === "error") {
+    Workspace.setSources([], null, "FAILED");
+    chat.querySelectorAll(".err[data-current-error]").forEach(node => node.remove());
+    const message = "出错了：" + (data.message || "请求未完成，请核对后手动重试");
+    let failure;
+    if (pending) { pending.body.textContent = message; pending.root.classList.add("err"); failure = pending.body; }
+    else { failure = el("div", "err", message); chat.appendChild(failure); }
+    failure.closest(".err").dataset.currentError = "true";
+    const retryQuery = pendingUserText;
+    if (!$("q").value && retryQuery) { $("q").value=retryQuery; $("q").dispatchEvent(new Event("input")); }
+    const retry = el("button", "subtle-button", "↻ 手动重试"); retry.type = "button";
+    const authenticationError = /认证|API Key|401/i.test(message);
+    retry.textContent = authenticationError ? "重新登录 / 设置凭据" : "↻ 手动重试";
+    retry.onclick = () => authenticationError ? $("keyBtn").click() : ask(retryQuery); failure.appendChild(retry);
+    pending = null;
+    if (transportMode === "ws") $("send").disabled = false;
+    // Never replay an SSE request automatically: the server may already have accepted it.
+    if (transportMode === "ws" && outbox.length) flushOutbox();
+  }
+}
+function flushOutbox() {
+  if (transportMode !== "ws") return;
+  while (outbox.length) {
+    const q = outbox.shift();
+    chat.querySelectorAll('[data-outbox="1"]').forEach(x => x.remove());
+    pendingUserText = q;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      $("send").disabled = true;
+      ws.send(JSON.stringify({ query: q, session_id: sessionId }));
+    }
+    break;  // 一次补发一条，避免流式并发冲突
+  }
+}
+function connect() {
+  if (transportMode !== "ws" || (ws && ws.readyState <= WebSocket.OPEN)) return;
+  const scheme = location.protocol === "https:" ? "wss" : "ws";
+  const authQuery = apiKey()
+    ? "?key=" + encodeURIComponent(apiKey())
+    : "?user_id=web-ui&roles=ops&tenant_id=default";
+  const current = ws = new WebSocket(`${scheme}://${location.host}/qa/ws${authQuery}`);
+  ws.onopen = () => { if (transportMode !== "ws") { current.close(); return; }
+    reconnectDelay = 2000; wsAlive = true;
+    $("status").textContent = "已连接"; $("dot").className = "dot ok";
+    $("send").disabled = false;
+    if (outbox.length) flushOutbox(); };
+  ws.onmessage = ev => {
+    if (transportMode !== "ws" || ws !== current) return;
+    const { event, data } = JSON.parse(ev.data);
+    handleChatEvent(event, data);
+  };
+  ws.onclose = () => {
+    if (ws !== current) return;
+    ws = null;
+    wsAlive = false;
+    if (transportMode !== "ws") return;
+    if (pending) handleChatEvent("error", { message: "回答连接中断，请核对后手动重试。" });
+    $("send").disabled = false;
+    $("dot").className = "dot bad";
+    $("status").textContent = `实时通道断开，${Math.round(reconnectDelay / 1000)}s 后重连…`;
+    wsReconnectTimer = setTimeout(connect, reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, 30000);  // 指数退避，封顶 30s
+  };
+}
+if (transportMode === "ws") connect();
+$("transportMode").onchange = () => {
+  const next = $("transportMode").value;
+  if (next === transportMode) return;
+  cancelActiveSse();
+  transportMode = next;
+  lastSseFailed = false;
+  $("qaVersion").disabled = next !== "sse";
+  localStorage.setItem("chat_transport", next);
+  pending = null;
+  $("send").disabled = false;
+  if (next === "sse") {
+    if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+    if (ws) ws.close();
+    if (outbox.length) {
+      outbox.length = 0;
+      chat.querySelectorAll('[data-outbox="1"]').forEach(x => { x.textContent = "未自动重发；请确认后手动发送。"; x.removeAttribute("data-outbox"); });
+    }
+    wsAlive = false;
+    $("status").textContent = "SSE 就绪";
+    $("dot").className = "dot ok";
+  } else {
+    $("status").textContent = "兼容通道连接中…";
+    connect();
+  }
+};
+$("qaVersion").disabled = transportMode !== "sse";
+
+async function sendSse(query, turnSession) {
+  const turn = { controller: new AbortController(), session: turnSession, failed: false };
+  activeSse = turn;
+  lastSseFailed = false;
+  $("send").disabled = true;
+  $("status").textContent = "回答生成中…";
+  try {
+    const response = await fetch("/qa/sse", {
+      method: "POST", headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ query, session_id: turnSession,
+        ...($("qaVersion").value ? { kb_version: $("qaVersion").value } : {}) }),
+      signal: turn.controller.signal
+    });
+    if (!response.ok) {
+      const label = response.status === 401 ? "认证失败，请设置有效 API Key" :
+                    response.status === 404 ? "知识版本不可用或无预览权限，请切回激活版本并检查 Key" :
+                    response.status === 429 ? "服务繁忙，请稍后手动重试" : `请求失败（HTTP ${response.status}）`;
+      throw new Error(label);
+    }
+    await SseClient.consume(response.body, (name, data) => {
+      if (activeSse !== turn || sessionId !== turnSession) return;
+      const mapped = { meta: "start", token: "delta", done: "end" }[name] || name;
+      if (mapped === "error") turn.failed = true;
+      handleChatEvent(mapped, data);
+    });
+  } catch (error) {
+    if (!turn.controller.signal.aborted && activeSse === turn && sessionId === turnSession) {
+      turn.failed = true;
+      handleChatEvent("error", { message: error.message || "连接中断，请核对后手动重试" });
+    }
+  } finally {
+    const current = activeSse === turn;
+    if (current) activeSse = null;
+    if (current && sessionId === turnSession && transportMode === "sse") {
+      $("send").disabled = false;
+      lastSseFailed = turn.failed;
+      $("status").textContent = turn.failed ? "流式输出未完成，请核对后手动重试" : "SSE 就绪";
+    }
+  }
+}
+
+/* ---------- 回放本地历史 ---------- */
+renderSessionMessages(sessionId);
+
+/* ---------- 输入与快捷问题 ---------- */
+let lastQuery = "";
+function ask(query) {
+  const q = query.trim();
+  if (!q || $("send").disabled || activeSse) return;
+  chat.querySelector(".welcome")?.remove();
+  document.getElementById("view-qa")?.classList.add("has-dialog");
+  addUser(q);
+  lastQuery = q;
+  registerSession(sessionId, q);
+  pendingUserText = q;
+  $("q").value = "";
+  $("q").dispatchEvent(new Event("input"));
+  if (transportMode === "sse") {
+    sendSse(q, sessionId);
+  } else if (ws && ws.readyState === WebSocket.OPEN) {
+    $("send").disabled = true;
+    ws.send(JSON.stringify({ query: q, session_id: sessionId }));
+  } else {
+    // Reconnecting the transport must never submit a question without another user action.
+    handleChatEvent("error", { message: "连接尚未就绪，请连接恢复后手动重试。" });
+    scroll();
+  }
+}
+const qEl = $("q");
+$("f").addEventListener("submit", e => { e.preventDefault(); ask(qEl.value); });
+qEl.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask(qEl.value); }
+});
+qEl.addEventListener("input", () => {
+  saveQuestionDraft();
+  qEl.style.height = "auto";
+  const contentHeight=qEl.scrollHeight;
+  qEl.style.height = Math.min(contentHeight, 140) + "px";
+  qEl.style.overflowY=contentHeight>140?'auto':'hidden';
+  $("charHint").textContent = qEl.value.length ? `${qEl.value.length}/500` : "";
+});
+restoreQuestionDraft();
+window.addEventListener('storage', e => { if(e.key === 'api_key' || e.key === null) restoreQuestionDraft(); });
+$("recommendedQuestions")?.addEventListener("click", event => {
+  const button = event.target.closest("button[data-q]");
+  if (button) Workspace.fillQuestion(button.dataset.q);
+});
+
+/* ---------- 历史会话抽屉（问答局部） ---------- */
+const sessDrawer = $("sessDrawer"), sessMask = $("sessMask");
+let sessTrigger = null;
+function openSessDrawer() {
+  if (!sessDrawer) return;
+  Workspace.closeDrawer(); sessTrigger=document.activeElement;
+  sessDrawer.setAttribute('role','dialog');sessDrawer.setAttribute('aria-modal','true');
+  sessDrawer.hidden = false; if (sessMask) sessMask.hidden = false;
+  sessDrawer.querySelector("#sessDrawerClose")?.focus();
+}
+function closeSessDrawer(restore = true) {
+  if (!sessDrawer) return;
+  sessDrawer.hidden = true; if (sessMask) sessMask.hidden = true;
+  sessDrawer.removeAttribute('role');sessDrawer.removeAttribute('aria-modal');
+  if(restore&&sessTrigger?.isConnected)sessTrigger.focus();
+}
+$("qaHistoryBtn")?.addEventListener("click", openSessDrawer);
+$("sessDrawerClose")?.addEventListener("click", closeSessDrawer);
+sessMask?.addEventListener("click", closeSessDrawer);
+document.addEventListener("keydown", event => {
+  if(!sessDrawer || sessDrawer.hidden)return;
+  if(event.key==='Escape')closeSessDrawer();
+  if(event.key==='Tab'){
+    const choices=[...sessDrawer.querySelectorAll('button,input,a[href]')].filter(n=>!n.disabled&&n.getClientRects().length);
+    const first=choices[0],last=choices.at(-1);
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+  }
+});
+
+/* ---------- 导出会话 Markdown ---------- */
+$("exportBtn").onclick = () => {
+  const msgs = loadMessages(sessionId);
+  if (!msgs.length) { $("exportBtn").textContent = "无内容"; setTimeout(() => $("exportBtn").textContent = "📥", 1200); return; }
+  let md = `# 通信运维问答记录\n\n> 会话 ${sessionId} · 导出于 ${new Date().toLocaleString()}\n\n`;
+  msgs.forEach(m => {
+    if (m.role === "user") md += `## ❓ ${m.text}\n\n`;
+    else {
+      md += `### 🤖 回答\n\n${m.text}\n\n`;
+      if (m.sources?.length) md += `**来源：** ${m.sources.map(s => s.source || s.doc_id).join("、")}\n\n`;
+      if (m.decision) md += `> 路由 ${m.decision.route} · 意图 ${m.decision.intent}\n\n`;
+    }
+  });
+  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `运维问答_${sessionId.slice(0, 8)}.md`;
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ---------- 右侧诊断面板收放 ---------- */
+if (localStorage.getItem("right_collapsed") === "1") document.body.classList.add("right-collapsed");
+$("burgerR").onclick = () => {
+  if (document.body.classList.contains('context-open')) Workspace.closeDrawer();
+  else Workspace.openDrawer('context-open', document.querySelector('#view-qa aside.right'));
+};
+
+/* ---------- 左侧边栏收放 ---------- */
+if (localStorage.getItem("side_collapsed") === "1") document.body.classList.add("side-collapsed");
+$("burger").onclick = () => {
+  if (matchMedia("(max-width: 760px)").matches) { document.body.classList.contains("mobile-menu") ? Workspace.closeDrawer() : Workspace.openDrawer('mobile-menu', document.querySelector('aside.workspace-sidebar')); return; }
+  const collapsed = document.body.classList.toggle("side-collapsed");
+  localStorage.setItem("side_collapsed", collapsed ? "1" : "0");
+};
+
+/* ---------- API Key 设置 ---------- */
+$("keyBtn").onclick = () => { $("keyInput").value = localStorage.getItem("api_key") || ""; $("keyDlg").showModal(); };
+$("keySave").onclick = () => {
+  cancelActiveSse(); Workspace.reset(); AgentWorkspace.reset(); AlertsWorkspace.close();
+  const v = $("keyInput").value.trim();
+  if (v) localStorage.setItem("api_key", v); else localStorage.removeItem("api_key");
+  $("keyDlg").close();
+  restoreQuestionDraft();
+  $("qaVersion").replaceChildren(new Option("当前激活版本", ""));
+  KnowledgeWorkspace.credentialsChanged();
+  QueryWorkspace.credentialsChanged();
+  GovernanceWorkspace.credentialsChanged();
+  BusinessWorkspace.credentialsChanged();
+  VersionWorkspace.credentialsChanged();
+  health();
+};
+renderSessionList();
+
+/* ================= Tab 工作台 ================= */
+async function fetchJSON(url) {
+  const r = await fetch(url, { headers: { "X-User-Roles": "admin,auditor,ops", ...authHeaders() } });
+  if (!r.ok) throw new Error(`${url} -> ${r.status}`);
+  return r.json();
+}
+
+function switchTab(tabId, params = {}) {
+  const previousTab = document.body.dataset.tab;
+  window.__tabScroll ||= {};
+  if (previousTab) window.__tabScroll[previousTab] = $("view-" + previousTab)?.scrollTop || 0;
+  Workspace.closeDrawer(false);
+  if(tabId!=='qa')closeSessDrawer(false);
+  GovernanceWorkspace.leave();
+  KnowledgeWorkspace.leave();
+  BusinessWorkspace.leave();
+  VersionWorkspace.leave();
+  AlertsWorkspace.leave();
+  GovernanceKbWorkspace.leave();
+  QueryWorkspace.leave();
+  LabWorkspace.leave();
+  if (tabId !== "qa") { cancelActiveSse(); Workspace.reset(); }
+  if (tabId !== "agent") AgentWorkspace.standby();  // 保留诊断结果与草稿，返回可继续
+  else cancelActiveSse();
+  for (const id of ["transportMode", "qaVersion", "exportBtn"]) $(id).hidden = tabId === "agent";
+  // 知识管理四条子页签共用一条侧栏入口：进入其中任一视图时高亮对应子项
+  const subnav = $("knowledgeSubnav");
+  if (subnav) {
+    const isKnowledge = ["kb", "docs", "gk", "versions"].includes(tabId);
+    subnav.hidden = !isKnowledge;
+    subnav.querySelectorAll(".subnav-item").forEach(item => {
+      item.classList.toggle("is-active", item.dataset.subtab === tabId);
+    });
+  }
+  // 问答专用控件只在问答页出现，其它板块保持整洁（display 覆盖 author CSS 中的 flex）
+  for (const id of ["transportMode", "qaVersion", "exportBtn", "burgerR"]) $(id).style.display = tabId === "qa" ? "" : "none";
+  document.body.classList.remove("mobile-menu", "context-open");
+  document.querySelectorAll(".nav-item").forEach(x => { x.classList.toggle("active", x.dataset.tab === tabId); if (x.dataset.tab === tabId) x.setAttribute("aria-current", "page"); else x.removeAttribute("aria-current"); });
+  document.querySelectorAll(".tabview").forEach(v => v.classList.toggle("active", v.id === "view-" + tabId));
+  // 诊断面板仅对问答有意义：切到其他板块自动收起，切回按用户手动偏好恢复
+  const userPref = localStorage.getItem("right_collapsed") === "1";
+  // 问答：没有引用时默认收起证据栏，不占用正文宽度；有引用时按偏好展开
+  const evidenceCount = Number($("evidenceCount")?.textContent || 0) + Number($("contextEvidenceCount")?.textContent || 0);
+  const autoCollapsed = tabId === "qa" && evidenceCount === 0 ? true : userPref;
+  document.body.classList.toggle("right-collapsed", tabId !== "qa" ? true : autoCollapsed);
+  $("pageTitle").textContent = { dashboard: "总览看板", alerts: "告警与资源", query: "业务查询", qa: "运维问答", agent: "诊断工作台", kb: "知识浏览", docs: "上传资料",
+    gk: "待处理问题", ops: "运行状态", eval: "评测记录", perm: "访问管理", lab: "场景实验室", business: "集成状态", versions: "版本与发布" }[tabId] || "";
+  // 面包屑体现父子关系：知识管理子视图归入“知识管理”，设置类归入“管理设置”
+  const crumb = $("pageCrumb");
+  if (crumb) {
+    crumb.textContent = ["kb", "docs", "gk", "versions"].includes(tabId) ? "知识管理 /"
+      : ["ops", "eval", "perm", "business"].includes(tabId) ? "管理设置 /"
+      : tabId === "lab" ? "开发工具 /" : "工作台 /";
+  }
+  const loaders = { qa: p => { if(typeof p.query==='string')Workspace.fillQuestion(p.query); }, dashboard: () => DashboardWorkspace.load(), alerts: p => AlertsWorkspace.load(p), query: () => QueryWorkspace.load(), gk: p => GovernanceKbWorkspace.load(p), kb: p => loadKb(p), docs: p => loadDocs(p), lab: () => LabWorkspace.load(),
+    ops: () => loadOps(), eval: () => loadEval(), perm: () => loadPerm(), agent: p => AgentWorkspace.fill(p),
+    business: p => BusinessWorkspace.load(p), versions: p => VersionWorkspace.load(p) };
+  document.body.dataset.tab = tabId;
+  const view = $("view-" + tabId);
+  if (view) view.scrollTop = window.__tabScroll[tabId] || 0;
+  const safe = Object.fromEntries(Object.entries(params || {}).filter(([, value]) => value !== undefined && value !== null && value !== ""));
+  try { history.replaceState(null, "", "#" + new URLSearchParams({ tab: tabId, ...safe }).toString()); } catch {}
+  Promise.resolve(loaders[tabId]?.(safe)).catch(e => {
+    console.error(e);
+    if (!view) return;
+    view.querySelectorAll(".err, .skeleton").forEach(x => x.remove());  // 清旧错误与骨架，避免累积
+    const error = document.createElement("div"); error.className = "notice bad"; error.textContent = "板块数据加载失败：" + e.message; view.prepend(error);
+  });
+}
+document.querySelectorAll(".nav-item").forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+document.querySelectorAll("#knowledgeSubnav .subnav-item").forEach(item => {
+  item.onclick = () => switchTab(item.dataset.subtab);
+});
+// 告警码速查输入
+const alarmAsk = () => {
+  const v = $("alarmInput").value.trim().toUpperCase();
+  if (!/^ALM-?\d{3,6}$/i.test(v)) { $("alarmInput").value = "格式：ALM-1201"; setTimeout(() => $("alarmInput").value = "", 1200); return; }
+  $("alarmInput").value = "";
+  switchTab("qa");
+  ask(v + " 这个告警怎么处理");
+};
+// 侧栏告警速查已并入问答的“业务上下文”输入；这里只为潜在的自定义容器保留兼容绑定
+if ($("alarmGo") && $("alarmInput")) {
+  $("alarmGo").onclick = alarmAsk;
+  $("alarmInput").addEventListener("keydown", e => { if (e.key === "Enter") alarmAsk(); });
+}
+// 业务上下文输入支持告警码：输入 ALM-xxxx 后回车，直接按“该告警怎么处理”提问
+$("contextId")?.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
+  const value = $("contextId").value.trim().toUpperCase();
+  if (!/^ALM-?\d{3,6}$/.test(value)) return;
+  event.preventDefault();
+  $("contextId").value = "";
+  ask(value + " 这个告警怎么处理");
+  if (typeof window.switchTab === "function") window.switchTab("qa");
+});
+
+function barChart(container, items, unit) {
+  const max = Math.max(1, ...items.map(i => i[1]));
+  container.innerHTML = items.map(([name, val]) =>
+    `<div class="brow"><span class="name" title="${name}">${name}</span>` +
+    `<span class="bar"><i style="width:${Math.round(val / max * 100)}%"></i></span>` +
+    `<span class="val">${val}${unit || ""}</span></div>`).join("") ||
+    '<div class="muted">暂无数据</div>';
+}
+
+/* ---- Scoped catalog / explicit upload workspace ---- */
+function applyListParams(view, params = {}) {
+  const prefix = view === 'kb' ? 'kb' : 'doc';
+  if (typeof params.query === 'string') $(prefix + 'Search').value = params.query;
+  if (typeof params.origin === 'string') $(prefix + 'Origin').value = params.origin;
+  if (typeof params.kind === 'string' && view === 'kb') $('kbKind').value = params.kind;
+  if (typeof params.version === 'string') $(prefix + 'Version').value = params.version;
+}
+async function loadKb(params = {}) { applyListParams('kb', params); return KnowledgeWorkspace.load('kb'); }
+async function loadDocs(params = {}) {
+  applyListParams('docs', params);
+  const result = await KnowledgeWorkspace.load('docs');
+  if (params.focus === 'jobs') { KnowledgeWorkspace.showPane('jobs'); setTimeout(() => $('stepJobs')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 80); }
+  return result;
+}
+
+async function loadOps(){return GovernanceWorkspace.load('ops');}
+async function loadEval(){return GovernanceWorkspace.load('eval');}
+async function loadPerm(){return GovernanceWorkspace.load('perm');}
+GovernanceWorkspace.init({headers:authHeaders,key:apiKey,showQa:()=>switchTab('qa'),showCredentials:()=>$('keyBtn').click(),credentialsReset:()=>{$('keyInput').value='';if($('keyDlg').open)$('keyDlg').close();}});
+KnowledgeWorkspace.init({headers:authHeaders,key:apiKey,showQa:()=>switchTab('qa')});
+VersionWorkspace.init({headers:authHeaders,key:apiKey});
+BusinessWorkspace.init({headers:authHeaders,key:apiKey,diagnose:()=>window.open('http://127.0.0.1:18021/','_blank','noopener')});
+DashboardWorkspace.init({headers:authHeaders,key:apiKey});
+GovernanceKbWorkspace.init({headers:authHeaders,key:apiKey,go:(tab,params)=>switchTab(tab,params||{})});
+QueryWorkspace.init({headers:authHeaders,key:apiKey});
+LabWorkspace.init({headers:authHeaders,key:apiKey,go:(tab,params)=>switchTab(tab,params||{})});
+$('labRefresh').onclick = () => LabWorkspace.load();
+$('queryBoundaryBtn')?.addEventListener('click', () => {
+  const box = $('queryBoundary');
+  if (!box) return;
+  box.open = !box.open;
+  if (box.open) box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+});
+$('gkRefresh').onclick = () => GovernanceKbWorkspace.load({});
+AlertsWorkspace.init({headers:authHeaders,key:apiKey,go:(tab,params)=>switchTab(tab,params||{})});
+DevicesWorkspace.init({headers:authHeaders,key:apiKey});
+TicketsWorkspace.init({headers:authHeaders,key:apiKey,go:(tab,params)=>switchTab(tab,params||{})});
+// 统一子页签切换：供点击与“同范围明细”跳转共用，跳转可带筛选条件。
+window.switchAlertPane = function (key, params = {}) {
+  document.querySelectorAll('#alertsSubtabs .sub-tab').forEach(b => {
+    const on = b.dataset.alertstab === key;
+    b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  $('alertsPane').hidden = key !== 'alerts';
+  $('devicesPane').hidden = key !== 'devices';
+  $('ticketsPane').hidden = key !== 'tickets';
+  const listView = $('alertsListView');
+  if (listView) listView.hidden = key !== 'alerts';
+  if (key === 'devices') DevicesWorkspace.load();
+  if (key === 'tickets') TicketsWorkspace.load(params || {});
+  if (key === 'alerts' && params && params.reload) AlertsWorkspace.load(params);
+};
+document.querySelectorAll('#alertsSubtabs .sub-tab').forEach(btn => {
+  btn.onclick = () => window.switchAlertPane(btn.dataset.alertstab, {});
+});
+$("agentToBusiness").onclick = () => switchTab("business");
+$("agentToQa").onclick = () => switchTab("qa");
+// 深链：刷新后仍停留在同一板块与筛选
+(() => {
+  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const tab = params.get("tab") || "dashboard";
+  const extra = Object.fromEntries(params.entries());
+  delete extra.tab;
+  switchTab(tab, extra);
+})();
+</script>
+<script src="/static/shell.js"></script>
+</body>
+</html>

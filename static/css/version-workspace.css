@@ -1,0 +1,31 @@
+/* 版本与发布：当前版本摘要、版本列表、详情与发布步骤 */
+#view-versions { overflow-wrap: anywhere; }
+#view-versions pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; font: 12px/1.7 var(--font-mono); max-width: 100%; }
+#view-versions select, #view-versions input { max-width: 100%; box-sizing: border-box; }
+#versionSummary { margin-bottom: 14px; }
+#versionSummary .surface { margin-bottom: 10px; }
+#versionList { display: grid; gap: 8px; margin-top: 4px; }
+.version-item { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 10px;
+  padding: 11px 13px; cursor: pointer; display: grid; gap: 5px; font: inherit; color: var(--ink); }
+.version-item:hover { border-color: var(--brand); }
+.version-item[data-selected="true"] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--color-brand-50); }
+.version-item-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.version-item-top strong { font-size: 13px; overflow-wrap: anywhere; }
+.version-item p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.6; }
+#versionDetail .section-head h2 { font-size: 16px; overflow-wrap: anywhere; }
+#versionDetail > p { font-size: 12.5px; }
+#versionDetail .tech-details { margin-top: 10px; }
+#versionConfirm { display: block; width: 100%; padding: 10px; margin: 10px 0; }
+.blocker-list { margin: 8px 0; padding-left: 18px; color: var(--color-danger); font-size: 12.5px; line-height: 1.8; }
+.blocker-list li { margin: 4px 0; }
+#versionGate { display: block; }
+#versionGate > p { grid-column: 1 / -1; }
+#versionRuntimeHandoff { margin-top: 14px; }
+#versionWorkflow button { max-width: 100%; }
+@media(max-width: 760px) { .version-item p { font-size: 11px; } }
+
+.version-steps { margin-top:18px; }
+#versionWorkflow > .notice { margin-top:14px; }
+#view-versions > .two-col { grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:22px; }
+#view-versions > .two-col > .surface { margin-top:0; }
+@media(max-width:1080px) { #view-versions > .two-col { grid-template-columns:1fr; } }

@@ -1,0 +1,5 @@
+.isolated-shell{--line:#dce4f0;--muted:#65738c;--brand:#315ad7;--ink:#1b2d47}
+.isolated-shell .detail-list>div{display:grid;grid-template-columns:minmax(110px,1fr) minmax(0,2fr);gap:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+.isolated-shell .detail-list dd{margin:0;overflow-wrap:anywhere}
+.isolated-shell .agent-form-note{color:var(--muted)}
+.isolated-shell .agent-card .evidence-original{padding:12px;background:#f4f7fb;border-radius:8px;overflow-y:auto}

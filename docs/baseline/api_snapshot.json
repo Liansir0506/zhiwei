@@ -1,0 +1,46 @@
+{
+  "captured_at": "2026-09-17T17:43:22+08:00",
+  "source": "live OpenAPI on http://127.0.0.1:8010 plus static WebSocket/root inspection",
+  "openapi_http_path_count": 21,
+  "paths": [
+    {"method": "GET", "path": "/", "schema": false, "purpose": "main UI"},
+    {"method": "GET", "path": "/health", "purpose": "component health"},
+    {"method": "POST", "path": "/qa", "purpose": "synchronous QA"},
+    {"method": "WS", "path": "/qa/ws", "schema": false, "purpose": "streaming QA"},
+    {"method": "POST", "path": "/feedback", "purpose": "answer feedback"},
+    {"method": "GET", "path": "/kb/versions", "purpose": "knowledge versions"},
+    {"method": "POST", "path": "/kb/activate", "purpose": "activate version"},
+    {"method": "POST", "path": "/kb/rollback", "purpose": "rollback version"},
+    {"method": "POST", "path": "/alerts/webhook", "purpose": "alarm integration"},
+    {"method": "GET", "path": "/metrics", "purpose": "Prometheus metrics"},
+    {"method": "GET", "path": "/admin", "purpose": "admin UI"},
+    {"method": "GET", "path": "/admin/", "purpose": "admin UI alias"},
+    {"method": "GET", "path": "/admin/overview", "purpose": "governance overview"},
+    {"method": "GET", "path": "/admin/overview/raw", "purpose": "raw overview"},
+    {"method": "GET", "path": "/admin/ops", "purpose": "operations metrics"},
+    {"method": "GET", "path": "/admin/eval", "purpose": "evaluation report"},
+    {"method": "GET", "path": "/admin/kb", "purpose": "knowledge browser"},
+    {"method": "GET", "path": "/admin/documents", "purpose": "document inventory"},
+    {"method": "GET", "path": "/admin/documents/chunks", "purpose": "chunk trace"},
+    {"method": "POST", "path": "/admin/documents/upload", "purpose": "upload and ingest"},
+    {"method": "DELETE", "path": "/admin/documents", "purpose": "remove indexed document"},
+    {"method": "GET", "path": "/admin/permissions", "purpose": "permission inventory"},
+    {"method": "POST", "path": "/admin/keys", "purpose": "issue API key"},
+    {"method": "DELETE", "path": "/admin/keys/{hash_prefix}", "purpose": "revoke API key"}
+  ],
+  "documented_but_not_implemented": [
+    "/kb/rebuild",
+    "/kb/rebuild/{run_id}",
+    "/kb/versions/{version}/activate",
+    "/kb/versions/{version}/rollback",
+    "/quality/gate",
+    "/eval/run",
+    "/eval/runs/{id}",
+    "/scenario"
+  ],
+  "notes": [
+    "AUTH_REQUIRED defaults to false in the baseline.",
+    "Root and WebSocket routes are not present in OpenAPI path count.",
+    "Only read-only GET requests were executed during baseline capture."
+  ]
+}
